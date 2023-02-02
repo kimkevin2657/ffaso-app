@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "774370360981",
+    "project_id": "ffaso-app",
+    "storage_bucket": "ffaso-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:774370360981:android:ed24adc39b65ccac28659c",
+        "android_client_info": {
+          "package_name": "com.bbtalk"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "774370360981-4rlu673tjk3e26071g9jumd5t6h8j5gn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxIWEmaE-6coTZ0XIaJVyiniHXDxHHlHo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "774370360981-4rlu673tjk3e26071g9jumd5t6h8j5gn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
