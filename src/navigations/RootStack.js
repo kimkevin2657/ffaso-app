@@ -39,6 +39,7 @@ import TicketPaymentScreen from '../screens/member/payment/TicketPaymentScreen';
 import OptionPaymentScreen from '../screens/member/payment/OptionPaymentScreen';
 import TeacherScheduleDetailScreen from '../screens/teacher/TeacherScheduleDetailScreen';
 // import IamPortPaymentScreen from '../screens/member/payment/IamPortPaymentScreen';
+import PayplePaymentScreen from '../screens/member/payment/PayplePaymentScreen'
 import FindRoadScreen from '../screens/common/FindRoadScreen';
 import ScheduleCouponsScreen from '../screens/member/schedule/ScheduleCouponsScreen';
 import AcademicsModify from '../screens/teacher/profileModify/AcademicsModify';
@@ -254,6 +255,11 @@ const RootStack = () => (
       component={IamPortPaymentScreen}
       options={{ headerShown: false }}
     /> */}
+    <Stack.Screen
+      name='PayplePaymentScreen'
+      component={PayplePaymentScreen}
+      options={{ headerShown: false }}
+    />
     <Stack.Screen
       name='MembershipPayment'
       component={MembershipPaymentScreen}

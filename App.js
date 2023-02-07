@@ -15,6 +15,7 @@ import {
   StyleSheet,
   Platform,
   AppState,
+  Linking
 } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { NavigationContainer } from '@react-navigation/native';
@@ -37,6 +38,21 @@ const App: () => Node = () => {
   //   flex: 1,
   // };
 
+  const linking = {
+    prefixes: ['ffaso://'],
+    config: {
+      initialRouteName: 'home',
+      screens: {
+        home: {
+          path: 'MemberMainTab'
+        },
+        center: {
+          path: 'MemberCenterList'
+        }
+      }
+    }
+  }
+
   useEffect(() => {
     // if (Platform.OS === 'ios') {
     //   Geolocation.requestAuthorization('whenInUse');
@@ -56,7 +72,7 @@ const App: () => Node = () => {
       <Provider store={store}>
         <PersistGate persistor={persistor}>
           <QueryClientProvider client={queryClient}>
-            <NavigationContainer>
+            <NavigationContainer linking={linking}>
               <SafeAreaView style={styles.container}>
               <RootStack />
               </SafeAreaView>

@@ -13,6 +13,7 @@ import Touchable from '../../../components/buttons/Touchable';
 import { NormalBoldLabel, NormalLabel } from '../../../components/Label';
 import moment from 'moment';
 import api from '../../../api/api';
+import apiv3 from "../../../api/apiv3";
 import { commaNum, resetNavigation } from '../../../util';
 import { useSelector } from 'react-redux';
 import {
@@ -24,9 +25,10 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { MONTHS, SCREEN_WIDTH } from '../../../constants/constants';
 import CenterListModal from '../../../components/modal/CenterListModal';
+import { authenticate } from './payple';
 
 const OptionPaymentScreen = ({ navigation, route }) => {
-  const { token } = useSelector((state) => state.auth);
+  const { user, token } = useSelector((state) => state.auth);
   const { gym } = route.params;
 
   const [selectedOption, setSelectedOption] = useState(null);
@@ -34,6 +36,7 @@ const OptionPaymentScreen = ({ navigation, route }) => {
   const [optionDate, setOptionDate] = useState(new Date());
   const [isOptionDatePickerOpen, setIsOptionDatePickerOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('현금'); // or 'card'
+  const [oid, setOID] = useState('');
   const [termInfoOpen, setTermInfoOpen] = useState({
     PRODUCT: false,
     DEAL: false,
@@ -59,7 +62,7 @@ const OptionPaymentScreen = ({ navigation, route }) => {
     getProducts();
   }, []);
 
-  const onPayment = async (paymentMethod, hasCashReceipts) => {
+  const onPayment = async (paymentMethod, hasCashReceipt, oid) => {
     try {
       const config = {
         headers: {
@@ -86,11 +89,14 @@ const OptionPaymentScreen = ({ navigation, route }) => {
         type: paymentMethod, // 추후에 변경예상
         price,
         period: Number(selectedOptionMonth),
+        oid: oid
       };
       if (selectedProductDetailId) {
         body.productDetail = selectedProductDetailId;
       }
       // console.log('body', body);
+      console.log( "!!!!!============ option-rental api.post  body   ", body);
+      console.log( "!!!!!============ option-rental api.post  config   ", config);
       await api.post(`option-rental/`, body, config);
       // console.log('res', res);
       Alert.alert('결제가 완료되었습니다.');
@@ -100,6 +106,7 @@ const OptionPaymentScreen = ({ navigation, route }) => {
       console.log('e.res', e.response);
       if (e.response?.data && e.response?.data?.msg) {
         Alert.alert(e.response?.data?.msg);
+        resetNavigation(navigation, 'MemberMain');
       }
     }
   };
@@ -121,28 +128,60 @@ const OptionPaymentScreen = ({ navigation, route }) => {
     } else if (selectedOptionMonth === 0) {
       Alert.alert('등록 개월을 선택해주세요.');
     } else {
-      if (paymentMethod === '현금') {
-        Alert.alert('현금영수증이 필요하신가요?', '', [
-          {
-            text: '아니오',
-            onPress: () => onPayment('현금', false),
-          },
-          { text: '예', onPress: () => onPayment('현금', true) },
-        ]);
-      } else if (paymentMethod === 'card') {
-        // navigation.navigate('IamPortPayment', {
-        //   paymentMethod,
-        //   onComplete: (res) => {
-        //     const { success, imp_uid, merchant_uid, error_msg } = res;
-        //     if (success) {
-        //       onCheckIamPortPayment(imp_uid);
-        //       // onPayment('카드');
-        //     } else {
-        //       Alert.alert('결제에 실패하였습니다.', error_msg);
-        //     }
-        //   },
-        // });
-      }
+      console.log(" !!!!====== userId    ", user?.id, "     ", selectedOption?.id);
+      var checkerdata = await apiv3.post('option-exist-checker', {optionId: selectedOption?.id, userId: user?.id}, {headers: {Authorization: `Token ${token}`,},});
+      console.log(" !!!!!=======  checkerdata    ", checkerdata.data);
+      if (checkerdata.data.result == 0){
+
+          if (paymentMethod === '현금') {
+            Alert.alert('현금영수증이 필요하신가요?', '', [
+              {
+                text: '아니오',
+                onPress: () => onPayment('현금', false),
+              },
+              { text: '예', onPress: () => onPayment('현금', true) },
+            ]);
+          } else if (paymentMethod === 'card') {
+            console.log(" !!!==========  membership card payment    ", totalPrice);
+            authenticate().then((authdata) => {
+              console.log("!!!===== option authdata   ", authdata.data);
+              const selectNoblesss = selectedOption;
+              navigation.navigate('PayplePaymentScreen', {
+                  paymentMethod,
+                  totalPrice,
+                  authdata,
+                  gym,
+                  selectNoblesss,
+                  onComplete: (res) => {
+                    console.log("!!!!!======== option Payple onComplete res    ", res);
+                    if (res.status == true){
+                      setOID(res.msg);
+                      onPayment('카드', null, res.msg);
+                    }else{
+                      Alert.alert("결제에 실패하였습니다. ", res.msg);
+                    }
+                  }
+              })
+            }).catch((err) => {
+              console.log(" !!!====== membership authdata error     ", err);
+            })
+            // navigation.navigate('IamPortPayment', {
+            //   paymentMethod,
+            //   onComplete: (res) => {
+            //     const { success, imp_uid, merchant_uid, error_msg } = res;
+            //     if (success) {
+            //       onCheckIamPortPayment(imp_uid);
+            //       // onPayment('카드');
+            //     } else {
+            //       Alert.alert('결제에 실패하였습니다.', error_msg);
+            //     }
+            //   },
+            // });
+          }
+        }
+        if (checkerdata.data.result == 1){
+              Alert.alert("이미 옵션권이 존재합니다");
+        }
     }
   };
 

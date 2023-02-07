@@ -17,6 +17,7 @@ const TabBarIcon = ({ isFocus, focusImage, unFocusImage }) => {
 };
 
 export const MemberBottomTabs = () => {
+
   return (
     <Tab.Navigator
       tabBar={(props) => <MemberBottomTabBar {...props} />}
