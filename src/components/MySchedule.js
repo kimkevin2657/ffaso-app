@@ -4,6 +4,7 @@ import RowContainer from './containers/RowContainer';
 import Touchable from './buttons/Touchable';
 import { NormalBoldLabel, NormalLabel } from './Label';
 import SpaceBetweenContainer from './containers/SpaceBetweenContainer';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const MySchedule = ({
   onUpdate,
@@ -17,6 +18,10 @@ const MySchedule = ({
   receiver, // obj
   item,
   status,
+  setLocationX,
+  setLocationY,
+  setIsDropdownOpen,
+  setSelectedContent,
 }) => {
   return (
     <View style={[styles.container, status === '출석' && styles.attendEnd]}>
@@ -43,6 +48,16 @@ const MySchedule = ({
                 }}
               />
             </RowContainer>
+            <Touchable
+              onPress={(evt) => {
+                setIsDropdownOpen(true);
+                setSelectedContent(item);
+                setLocationX(evt.nativeEvent.pageX);
+                setLocationY(evt.nativeEvent.pageY);
+              }}
+            >
+              <MaterialIcons name='more-vert' size={20} color={'#AAAAAA'} />
+            </Touchable>
           </SpaceBetweenContainer>
           <NormalLabel
             text={item?.gymName}

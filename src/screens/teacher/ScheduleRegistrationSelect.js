@@ -16,6 +16,7 @@ import { useToggle } from '../../hooks/useToggle';
 import UnAvailableScheduleModal from '../../components/modal/v3/UnAvailableScheduleModal';
 import HolidayModal from '../../components/modal/v3/HolidayModal';
 import { resetNavigation } from '../../util';
+import { deleteUser } from '../../redux/authSlice';
 
 const ScheduleRegistrationSelect = ({ route, navigation }) => {
   const { responseDates, body } = route.params;
@@ -55,6 +56,23 @@ const ScheduleRegistrationSelect = ({ route, navigation }) => {
     }
   };
 
+  const onPressCheckConfirm = () => {
+    Alert.alert('일정을 등록하시겠습니까?', '', [
+      {
+        text: '취소',
+        onPress: () => {
+          console.log('Cancel Pressed');
+        },
+        style: 'cancel',
+      },
+      {
+        text: '등록',
+        onPress: () => {
+          onClickRegisterSchedule();
+        },
+      },
+    ]);
+  };
   const onClickRegisterSchedule = async () => {
     let values = {
       gymId: body.gymId,
@@ -68,7 +86,7 @@ const ScheduleRegistrationSelect = ({ route, navigation }) => {
     };
     try {
       const { data } = await apiv3.post('teacher-schedule-register', values);
-      Alert.alert('스케줄 등록 완료');
+      Alert.alert('일정 등록 완료');
       resetNavigation(navigation, 'TeacherMain');
     } catch (e) {
       if (e?.response?.data?.msg) {
@@ -106,6 +124,7 @@ const ScheduleRegistrationSelect = ({ route, navigation }) => {
       <SelectScheduleCalendar
         responseDates={responseDates}
         onClickUnavailableDate={onClickUnavailableDate}
+        body={body}
       />
       <View style={styles.textBox}>
         <RowContainer style={{ justifyContent: 'center' }}>
@@ -140,7 +159,7 @@ const ScheduleRegistrationSelect = ({ route, navigation }) => {
         <BottomGradientButton
           style={{ flex: 1 }}
           outerStyle={{ paddingVertical: 0, height: 52, marginHorizontal: 24 }}
-          onPress={onClickRegisterSchedule}
+          onPress={onPressCheckConfirm}
         >
           <NormalBoldLabel style={styles.bottomBtnText} text={'일정 등록'} />
         </BottomGradientButton>

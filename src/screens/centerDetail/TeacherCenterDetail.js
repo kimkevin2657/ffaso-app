@@ -157,18 +157,19 @@ const TeacherCenterDetail = ({ navigation, route }) => {
   }, []);
 
   const showPlusHolidays = useCallback((holidays) => {
-    const isSameNowAtHolidays = holidays.filter((holiday) =>
+    const isSameNowAtHolidays = holidays?.filter((holiday) =>
       moment(holiday).isSame(moment().format('YYYY-MM-DD'))
     );
-    const isAfterNowAtHolidays = holidays.filter((holiday) =>
+    const isAfterNowAtHolidays = holidays?.filter((holiday) =>
       moment(holiday).isAfter(moment())
     );
 
-    return isSameNowAtHolidays.length > 0 || isAfterNowAtHolidays.length > 0 ? (
+    return isSameNowAtHolidays?.length > 0 ||
+      isAfterNowAtHolidays?.length > 0 ? (
       <Text style={styles.titleList}>
         추가 휴관일 :{' '}
         {isSameNowAtHolidays?.map((holiday) => holiday).join(', ')}
-        {isSameNowAtHolidays.length > 0 ? ', ' : ''}
+        {isSameNowAtHolidays?.length > 0 ? ', ' : ''}
         {isAfterNowAtHolidays?.map((holiday) => holiday).join(', ')}
       </Text>
     ) : null;
@@ -257,12 +258,14 @@ const TeacherCenterDetail = ({ navigation, route }) => {
         </CenterModal>
       )}
       <ScrollView contentContainerStyle={{ paddingBottom: 30 }}>
-        <Touchable
-          onPress={() => navigation.navigate('TeacherCenterList')}
-          style={styles.backIcon}
-        >
-          <AntDesign name='left' size={22} color={'#555'} />
-        </Touchable>
+        <View style={styles.backIconWrapper}>
+          <Touchable
+            onPress={() => navigation.navigate('TeacherCenterList')}
+            style={styles.backIcon}
+          >
+            <AntDesign name='left' size={22} color={'#555'} />
+          </Touchable>
+        </View>
         {gymImages.length === 0 ? (
           <GymImage
             hasImage={gymImages.length > 0}
@@ -422,17 +425,21 @@ const TeacherCenterDetail = ({ navigation, route }) => {
             <View>
               <Text style={[styles.titleList, { paddingTop: 11 }]}>
                 평일 :{' '}
-                {`${weekdayStartTime?.substr(0, 5)} ~ ${weekdayEndTime?.substr(
-                  0,
-                  5
-                )}`}
+                {weekdayStartTime
+                  ? `${weekdayStartTime?.substr(
+                      0,
+                      5
+                    )} ~ ${weekdayEndTime?.substr(0, 5)}`
+                  : ''}
               </Text>
               <Text style={{ ...styles.titleList, marginBottom: 4 }}>
                 주말 :{' '}
-                {`${weekendStartTime?.substr(0, 5)} ~ ${weekendEndTime?.substr(
-                  0,
-                  5
-                )}`}
+                {weekdayStartTime
+                  ? `${weekendStartTime?.substr(
+                      0,
+                      5
+                    )} ~ ${weekendEndTime?.substr(0, 5)}`
+                  : ''}
               </Text>
 
               {showRegularHolidays(regularHolidays.allWeeks, '매주 휴관일')}
@@ -537,12 +544,14 @@ const TeacherCenterDetail = ({ navigation, route }) => {
 export default TeacherCenterDetail;
 
 const styles = StyleSheet.create({
+  backIconWrapper: {
+    zIndex: 2,
+  },
   backIcon: {
     position: 'absolute',
     top: 6,
     left: 8,
     padding: 4,
-    zIndex: 999,
   },
   inputBoxContainer: {
     height: 40,

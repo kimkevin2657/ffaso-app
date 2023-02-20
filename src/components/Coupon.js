@@ -18,14 +18,15 @@ const Coupon = ({
           source={require('../assets/images/mypage/coupon.png')}
           style={couponStyles.img}
         />
-        <View>
+        <View style={couponStyles.flexWrap}>
           <NormalLabel text={'#' + type} style={couponStyles.type} />
           <NormalBoldLabel text={name} style={couponStyles.name} />
           <Text style={couponStyles.defaultText}>
-            <Text style={couponStyles.boldText}>{`${
-              availableCount - currentCount
-            }/${availableCount}회`}</Text>
-            (남은횟수/제공횟수) |
+            [총
+            <Text
+              style={couponStyles.boldText}
+            >{` ${availableCount}회 중 ${currentCount}회 `}</Text>
+            사용 ({availableCount - currentCount}회 수강 가능) ] |
             <Text style={couponStyles.boldText}>{` ${expiryDate} `}</Text>
             까지
           </Text>
@@ -60,5 +61,12 @@ const couponStyles = StyleSheet.create({
   boldText: {
     fontWeight: 'bold',
   },
-  img: { marginRight: 16, width: 69, height: 45 },
+  img: {
+    marginRight: 16,
+    width: 69,
+    height: 45,
+  },
+  flexWrap: {
+    flex: 1,
+  },
 });

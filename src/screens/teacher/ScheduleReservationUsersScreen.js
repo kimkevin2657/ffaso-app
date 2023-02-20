@@ -26,7 +26,7 @@ import api from '../../api/api';
 import RowContainer from '../../components/containers/RowContainer';
 import Touchable from '../../components/buttons/Touchable';
 import SpaceBetweenContainer from '../../components/containers/SpaceBetweenContainer';
-import { renderAge } from '../../util';
+import { nestingNavigateReplace, renderAge } from '../../util';
 import { useSelector } from 'react-redux';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { SCREEN_WIDTH } from '../../constants/constants';
@@ -51,6 +51,20 @@ const ScheduleReservationUsersScreen = ({ navigation, route }) => {
   useLayoutEffect(() => {
     navigation.setOptions({
       title: date ?? '',
+      headerLeft: () => (
+        <Touchable
+          onPress={() =>
+            nestingNavigateReplace(navigation, 'TeacherMain', 'TeacherSchedule')
+          }
+        >
+          <AntDesign
+            name='left'
+            size={22}
+            color={'#555'}
+            style={{ padding: 4, alignSelf: 'center' }}
+          />
+        </Touchable>
+      ),
     });
   }, []);
 
@@ -126,11 +140,12 @@ const ScheduleReservationUsersScreen = ({ navigation, route }) => {
     }
 
     if (userList.length <= 0) {
-      Alert.alert('스케줄 변경가능한 유저가 존재하지않습니다');
+      Alert.alert('일정 변경가능한 유저가 존재하지않습니다');
       return;
     }
     setIsOpenAllSelectModal(true);
   };
+
   const onPressAllStatueChange = async () => {
     const userList = selectUserList.filter((data) => data.status !== '출석');
 
@@ -141,7 +156,6 @@ const ScheduleReservationUsersScreen = ({ navigation, route }) => {
 
     try {
       const { data } = await apiv3.post('reservation-update-status', body);
-      console.log(data);
       if (data?.msg) {
         Alert.alert(data?.msg);
       }
@@ -160,7 +174,6 @@ const ScheduleReservationUsersScreen = ({ navigation, route }) => {
         Alert.alert(err.response?.data?.msg);
       }
     }
-    //api성공시
   };
 
   const onPressAllClickToggle = () => {
@@ -195,9 +208,10 @@ const ScheduleReservationUsersScreen = ({ navigation, route }) => {
             }}
             isChecked={selectUserList.includes(item) && item.status !== '출석'}
             onChangeStatus={(id, status) => {
-              if (item.status === '출석') {
-                Alert.alert('', '이미 출석상태라 수정할 수 없습니다. ');
-              } else if (status === '출석') {
+              // if (item.status === '출석') {
+              //   Alert.alert('', '이미 출석상태라 수정할 수 없습니다. ');
+              // } else
+              if (status === '출석') {
                 setIsAttendModalOpen(true);
                 setSelectedUserAndStatus(item);
               } else {

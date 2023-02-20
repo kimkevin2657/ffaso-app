@@ -1,17 +1,15 @@
-import React, { useState } from 'react';
-
-import { Image, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Alert, StyleSheet } from 'react-native';
 import Touchable from '../../buttons/Touchable';
 import styled from 'styled-components/native';
-import { NoneLabel, NormalBoldLabel, NormalLabel } from '../../Label';
-import { TEACHER_SCHEDULE_TYPES } from '../../../constants/constants';
+import { NoneLabel, NormalBoldLabel } from '../../Label';
 import { useSelector } from 'react-redux';
 import SpaceBetweenContainer from '../../containers/SpaceBetweenContainer';
 import CenterListModal from '../CenterListModal';
 import RowContainer from '../../containers/RowContainer';
-import BirthPicker from '../../date/BirthPicker';
 import moment from 'moment';
 import TimeSelect from '../../date/TimeSelect';
+import api from '../../../api/api';
 
 const ScheduleUpdate = ({ setOpenModal, selectedContent, onPress }) => {
   const { teacherGyms = [] } = useSelector((state) => state.teacherGym);
@@ -19,23 +17,35 @@ const ScheduleUpdate = ({ setOpenModal, selectedContent, onPress }) => {
   const initialCenterIndex = teacherGyms.findIndex(
     (data) => data.gym === selectedContent.gym
   );
+  const [ticketList, setTicketList] = useState([]); //수강권 리스트
 
-  const [selectedClass, setSelectedClass] = useState(selectedContent?.type); // 선택한 업무유형
+  const classTime = !selectedContent
+    ? 0
+    : moment(selectedContent?.date + ' ' + selectedContent?.endTime).diff(
+        moment(selectedContent?.date + ' ' + selectedContent?.startTime)
+      ) / 60000;
+  const [selectedClass, setSelectedClass] = useState(
+    !selectedContent
+      ? null
+      : {
+          name: selectedContent?.lessonName,
+          time: classTime,
+        }
+  ); // 선택한 업무유형
+
   const [selectedStartTime, setSelectedStartTime] = useState(
     new Date(
       moment(
         selectedContent.startTime ? selectedContent.startTime : new Date(),
-        'hh:mm:ss'
+        'HH:mm:ss'
       )
     )
   );
   const [selectedEndTime, setSelectedEndTime] = useState(
     new Date(
-      new Date(
-        moment(
-          selectedContent.endTime ? selectedContent.endTime : new Date(),
-          'hh:mm:ss'
-        )
+      moment(
+        selectedContent.endTime ? selectedContent.endTime : new Date(),
+        'HH:mm:ss'
       )
     )
   );
@@ -44,25 +54,51 @@ const ScheduleUpdate = ({ setOpenModal, selectedContent, onPress }) => {
   const [birthDate, setBirthDate] = useState(
     new Date(moment(selectedContent?.date))
   );
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectCenter, setSelectCenter] = useState(
     initialCenterIndex !== -1 ? teacherGyms[initialCenterIndex] : {}
   );
   const [isCenterModalOpen, setIsCenterModalOpen] = useState(false);
+  const isSelectGym = Object.keys(selectCenter).length === 0;
+
+  useEffect(() => {
+    if (Object.keys(selectCenter).length !== 0) {
+      fetchTicketList();
+    }
+  }, [selectCenter]);
+
+  const fetchTicketList = async () => {
+    try {
+      const { data } = await api.get(`products?gymId=${selectCenter.gym}`);
+      const userDepartment = user?.department || '';
+      const lessonTicketList = data?.lessonTickets.filter(
+        (ticket) => ticket.department === userDepartment
+      );
+
+      setTicketList(lessonTicketList);
+      if (lessonTicketList?.length <= 0) {
+        Alert.alert('등록 가능한 수강권이 없습니다. 관리자에게 문의하세요');
+      }
+    } catch (e) {
+      if (e.response?.data && e.response?.data?.msg) {
+        Alert.alert(e.response?.data?.msg);
+      }
+      console.log(e);
+    }
+  };
 
   return (
     <Container>
       <TopContainer>
         <NoneLabel
-          text={'스케줄 수정'}
+          text={'일정 수정'}
           style={{ fontSize: 18, fontWeight: 'bold' }}
         />
       </TopContainer>
       <CenterContainer>
         <NormalBoldLabel
           style={{ ...styles.choiceTitle, marginTop: 18 }}
-          text={'센터 선택'}
+          text={'센터'}
         />
         <SpaceBetweenContainer style={styles.inputInner}>
           <CenterListModal
@@ -73,105 +109,86 @@ const ScheduleUpdate = ({ setOpenModal, selectedContent, onPress }) => {
             onPress={() => setIsCenterModalOpen(true)}
             visible={isCenterModalOpen}
             onRequestClose={() => setIsCenterModalOpen(false)}
-            onSelect={(obj) => setSelectCenter(obj)}
+            onSelect={(obj) => {
+              setSelectCenter(obj);
+              setSelectedClass(null);
+            }}
             placeholder={selectedContent?.gymName}
+            selectStyle={{
+              ...styles.centerName,
+              color: selectCenter?.gymName ? '#8082FF' : '#aaa',
+            }}
+            disabled
           />
         </SpaceBetweenContainer>
 
-        <NormalBoldLabel style={styles.choiceTitle} text={'강습 선택'} />
+        <NormalBoldLabel style={styles.choiceTitle} text={'일정 유형'} />
         <SpaceBetweenContainer style={styles.inputInner}>
           <CenterListModal
             containerStyle={styles.inputBox}
-            list={TEACHER_SCHEDULE_TYPES}
-            selectedItem={selectedClass}
+            list={ticketList}
+            selectedItem={`[${selectedClass?.name} ${selectedClass?.time}분]`}
             itemName={'name'}
-            onPress={() => setIsModalOpen(true)}
+            onPress={() => {
+              if (isSelectGym) {
+                alert('센터를 선택해주세요');
+                return;
+              }
+              if (ticketList.length === 0) {
+                alert('수강권이 존재하지않습니다');
+                return;
+              }
+              setIsModalOpen(true);
+            }}
             visible={isModalOpen}
             onRequestClose={() => setIsModalOpen(false)}
-            onSelect={(obj) => setSelectedClass(obj.name)}
+            onSelect={(obj) => {
+              setSelectedClass(obj);
+              if (obj) {
+                setSelectedEndTime(
+                  new Date(
+                    selectedStartTime.getTime() + (obj?.time ?? 0) * 60000
+                  )
+                );
+              }
+            }}
           />
         </SpaceBetweenContainer>
-        {/*  */}
-        <NormalBoldLabel text={'강사명'} style={styles.choiceTitle} />
-        <RowContainer style={styles.trainerInputInner}>
-          <View style={styles.trainerImageInner}>
-            {user?.profileImage ? (
-              <Image
-                source={{ uri: user.profileImage }}
-                style={{ width: 40, height: 40, borderRadius: 20 }}
-              />
-            ) : (
-              <Image
-                style={styles.trainerImage}
-                source={require('../../../assets/images/scheduleClick/userImage.png')}
-              />
-            )}
-          </View>
 
-          <View style={styles.inputBox}>
-            <NormalBoldLabel
-              text={`${user?.type} ${user?.koreanName}`}
-              style={{ color: '#555' }}
-            />
-          </View>
-        </RowContainer>
-        {/*  */}
-        {/*  */}
-        {/*<NormalBoldLabel text={'가능한 일정'} style={styles.choiceTitle} />*/}
-        {/*<View style={styles.birthdayBox}>*/}
-        {/*  <BirthPicker*/}
-        {/*    isOpen={isDatePickerOpen}*/}
-        {/*    date={birthDate}*/}
-        {/*    onConfirm={(selectedDate) => {*/}
-        {/*      setIsDatePickerOpen(false);*/}
-        {/*      setBirthDate(selectedDate);*/}
-        {/*    }}*/}
-        {/*    onCancel={() => setIsDatePickerOpen(false)}*/}
-        {/*  />*/}
-
-        {/*  <Touchable*/}
-        {/*    onPress={() => setIsDatePickerOpen(true)}*/}
-        {/*    style={styles.birthdayInputBox}*/}
-        {/*  >*/}
-        {/*    <View />*/}
-        {/*    <NormalLabel*/}
-        {/*      text={moment(birthDate).format('YYYY-MM-DD')}*/}
-        {/*      style={styles.birthLabel}*/}
-        {/*    />*/}
-
-        {/*    <Image*/}
-        {/*      style={{ width: 16, height: 18 }}*/}
-        {/*      source={require('../../../assets/icons/date.png')}*/}
-        {/*    />*/}
-        {/*  </Touchable>*/}
-        {/*</View>*/}
-        {/*  */}
-        {/*  */}
-        <NormalBoldLabel style={styles.choiceTitle} text={'시간 선택'} />
+        <NormalBoldLabel style={styles.choiceTitle} text={'일정 시간'} />
         <RowContainer>
           <TimeSelect
-            label={'스케줄 시작'}
+            label={'일정 시작'}
             isPickerOpen={isStartTimePickerOpen}
             time={selectedStartTime}
             onPress={() => setIsStartTimePickerOpen(true)}
             onConfirm={(selectedTime) => {
               setIsStartTimePickerOpen(false);
               setSelectedStartTime(selectedTime);
+              if (selectedClass) {
+                setSelectedEndTime(
+                  new Date(
+                    selectedTime.getTime() + (selectedClass?.time ?? 0) * 60000
+                  )
+                );
+              }
             }}
             onCancel={() => setIsStartTimePickerOpen(false)}
+            minuteInterval={10}
           />
-          <View style={{ width: 15 }} />
-          <TimeSelect
-            label={'스케줄 종료'}
-            isPickerOpen={isEndTimePickerOpen}
-            time={selectedEndTime}
-            onPress={() => setIsEndTimePickerOpen(true)}
-            onConfirm={(selectedTime) => {
-              setIsEndTimePickerOpen(false);
-              setSelectedEndTime(selectedTime);
-            }}
-            onCancel={() => setIsEndTimePickerOpen(false)}
-          />
+          {/*<View style={{ width: 15 }} />*/}
+          {/*<TimeSelect*/}
+          {/*  label={'일정 종료'}*/}
+          {/*  isPickerOpen={isEndTimePickerOpen}*/}
+          {/*  time={selectedEndTime}*/}
+          {/*  onPress={() => setIsEndTimePickerOpen(true)}*/}
+          {/*  onConfirm={(selectedTime) => {*/}
+          {/*    setIsEndTimePickerOpen(false);*/}
+          {/*    setSelectedEndTime(selectedTime);*/}
+          {/*  }}*/}
+          {/*  onCancel={() => setIsEndTimePickerOpen(false)}*/}
+          {/*  minuteInterval={10}*/}
+          {/*/>*/}
         </RowContainer>
       </CenterContainer>
       <BottomContainer>
@@ -183,14 +200,32 @@ const ScheduleUpdate = ({ setOpenModal, selectedContent, onPress }) => {
         </Touchable>
         <Touchable
           onPress={() => {
+            if (!selectCenter) {
+              Alert.alert('센터를 선택해주세요');
+              return;
+            }
+            if (!selectedClass) {
+              Alert.alert('일정 유형을 선택해주세요');
+              return;
+            }
+
+            if (selectedStartTime >= selectedEndTime) {
+              Alert.alert(
+                '일정 종료 시간을 일정 시작 시각 이후로 입력해주세요'
+              );
+              return;
+            }
+
             let params = {
-              gym: selectCenter.gym,
-              teacher: user?.id,
-              type: selectedClass,
+              id: selectedContent.id,
+              gymId: selectCenter.gym,
+              teacherId: user?.id,
+              lessonName: selectedClass.name,
               startTime: moment(selectedStartTime).format('HH:mm'),
               endTime: moment(selectedEndTime).format('HH:mm'),
               date: moment(birthDate).format('YYYY-MM-DD'),
             };
+
             onPress(params);
           }}
         >
@@ -406,6 +441,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
+  },
+  centerName: {
+    fontSize: 15,
+    fontWeight: 'bold',
   },
 });
 

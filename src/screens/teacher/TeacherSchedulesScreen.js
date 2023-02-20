@@ -21,7 +21,7 @@ const TeacherSchedulesScreen = ({ navigation }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      title: '스케줄러',
+      // title: '스케줄러',
       headerTitleAlign: 'center',
       headerStyle: {
         // backgroundColor: '#FBFBFB',
@@ -30,7 +30,6 @@ const TeacherSchedulesScreen = ({ navigation }) => {
         <TouchableOpacity
           style={{ padding: 4, marginRight: 16 }}
           onPress={() => navigation.navigate('ScheduleRegistration')}
-          // onPress={() => navigation.navigate('WorkTimeSetup')}
         >
           <Image
             style={styles.plusActionable}
@@ -43,22 +42,6 @@ const TeacherSchedulesScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/*<View style={styles.scheduleTopInner}>*/}
-      {/*  <View style={{ paddingHorizontal: 24 }}>*/}
-      {/*    <RowContainer style={styles.titleInner}>*/}
-      {/*      <View />*/}
-      {/*      <Text style={styles.containerName}>스케줄러</Text>*/}
-      {/*      <TouchableOpacity*/}
-      {/*        onPress={() => navigation.navigate('WorkTimeSetup')}*/}
-      {/*      >*/}
-      {/*        <Image*/}
-      {/*          style={styles.plusActionable}*/}
-      {/*          source={require('../../assets/images/bbatalk/plus.png')}*/}
-      {/*        />*/}
-      {/*      </TouchableOpacity>*/}
-      {/*    </RowContainer>*/}
-      {/*  </View>*/}
-      {/*</View>*/}
       <TeacherCalendarCustom navigation={navigation} schedules={schedules} />
     </View>
   );

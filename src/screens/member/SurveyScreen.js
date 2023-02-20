@@ -12,7 +12,7 @@ import Touchable from '../../components/buttons/Touchable';
 import RowContainer from '../../components/containers/RowContainer';
 import BottomGradientButton from '../../components/buttons/BottomGradientButton';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import { resetNavigation } from '../../util';
+import { resetNavigation, resetNestedNavigation } from '../../util';
 import { CheckBoxItem } from '../../components/CheckBoxItem';
 import api from '../../api/api';
 import { useSelector } from 'react-redux';
@@ -46,8 +46,6 @@ const SurveyScreen = ({ navigation, route }) => {
     try {
       const { data } = await api.get(`products?gymId=${gymId}`);
       setProducts(data);
-      console.log('products', data);
-      // setMemberships(data);
     } catch (e) {
       console.log(e);
       console.log(e.response);
@@ -70,22 +68,32 @@ const SurveyScreen = ({ navigation, route }) => {
         lessonProgram: bottomBoxStatus,
         etcOpinion: answer,
         receiverId: userId,
+        gym: gymId,
       };
-      // console.log('body', body);
-      const res = await api.post('inquires/', body, {
+
+      const { data } = await api.post('inquires/', body, {
         headers: { Authorization: `Token ${token}` },
       });
-      // console.log('성공', res);
-      Alert.alert(
-        '담당자와 채팅이 활성화되었습니다.',
-        '추가 궁금하신 점은 실시간 채팅으로 문의 바랍니다 :)',
-        [
-          {
-            text: '확인',
-            onPress: () => resetNavigation(navigation, 'MemberMain'),
+      let chatRoom = data;
+      let alertTitle = '담당자와 채팅이 활성화되었습니다.';
+      let alertContent = '추가 궁금하신 점은 실시간 채팅으로 문의 바랍니다 :)';
+
+      if (data?.status === 203) {
+        chatRoom = data.chat;
+        alertTitle = '이미 채팅방이 존재합니다.';
+        alertContent = '';
+      }
+
+      Alert.alert(alertTitle, alertContent, [
+        {
+          text: '확인',
+          onPress: () => {
+            resetNestedNavigation(navigation, 'MemberMain', 'MemberChatRoom');
+            navigation.navigate('Chat', { chatRoom });
           },
-        ]
-      );
+          // onPress: () => resetNavigation(navigation, 'MemberMain'),
+        },
+      ]);
     } catch (err) {
       console.log('err', err);
       console.log('err.response', err.response);

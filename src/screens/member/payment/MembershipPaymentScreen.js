@@ -12,7 +12,7 @@ import Touchable from '../../../components/buttons/Touchable';
 import { NormalBoldLabel, NormalLabel } from '../../../components/Label';
 import moment from 'moment';
 import api from '../../../api/api';
-import apiv3 from '../../../api/apiv3'
+import apiv3 from '../../../api/apiv3';
 import { commaNum, resetNavigation } from '../../../util';
 import { useSelector } from 'react-redux';
 import { Container } from '../../../components/containers/Container';
@@ -44,7 +44,6 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
   const [products, setProducts] = useState({});
   const [productDiscounts, setProductDiscounts] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
-  const [oid, setOID] = useState('');
   const [modalOpen, setModalOpen] = useState({
     product: false,
     date: false,
@@ -69,14 +68,18 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
         },
       };
 
-      let endDate = new Date(birthDate.getTime());
+      const endDate = new Date(birthDate.getTime());
+      const availableEndDate = new Date(
+        endDate.setMonth(birthDate.getMonth() + Number(selectMonth))
+      );
       const newEndDate = moment(
-        new Date(endDate.setMonth(birthDate.getMonth() + Number(selectMonth)))
+        availableEndDate.setDate(availableEndDate.getDate() - 1)
       ).format('YYYY-MM-DD');
-      const price =
-        !hasCashReceipts && selectNoblesss.hasCashDiscount
-          ? totalPrice * 0.9
-          : totalPrice;
+
+      const price = totalPrice;
+      // !hasCashReceipts && selectNoblesss.hasCashDiscount
+      //   ? totalPrice * 0.9
+      //   : totalPrice;
 
       const body = {
         membershipName: selectNoblesss?.name,
@@ -95,8 +98,6 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
       if (selectedProductDetailId) {
         body.productDetail = selectedProductDetailId;
       }
-      console.log( "!!!!!============ membership-payment api.post  body   ", body);
-      console.log( "!!!!!============ membership-payment api.post  config   ", config);
       await api.post(`membership-payment/`, body, config);
       // console.log('res', res);
       Alert.alert('결제가 완료되었습니다.');
@@ -106,7 +107,6 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
       console.log('e.res', e.response);
       if (e.response?.data && e.response?.data?.msg) {
         Alert.alert(e.response?.data?.msg);
-        resetNavigation(navigation, 'MemberMain');
       }
     }
   };
@@ -129,17 +129,17 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
       Alert.alert('등록 개월을 선택해주세요.');
     } else {
       var checkerdata = await apiv3.post('membership-exist-checker', {membershipId: selectNoblesss?.id, userId: user?.id}, {headers: {Authorization: `Token ${token}`,},});
-      if (checkerdata.data.result == 0){
-          if (paymentMethod === '현금') {
-            Alert.alert('현금영수증이 필요하신가요?', '', [
-              {
-                text: '아니오',
-                onPress: () => onPayment('현금', false),
-              },
-              { text: '예', onPress: () => onPayment('현금', true) },
-            ]);
-          } else if (paymentMethod === 'card') {
-            console.log(" !!!==========  membership card payment    ", totalPrice, "   ", selectMonth);
+      if (checkerdata.data.result === 0){
+        if (paymentMethod === '현금') {
+          Alert.alert('현금영수증이 필요하신가요?', '', [
+            {
+              text: '아니오',
+              onPress: () => onPayment('현금', false),
+            },
+            { text: '예', onPress: () => onPayment('현금', true) },
+          ]);
+        } else if (paymentMethod === 'card') {
+          console.log(" !!!==========  membership card payment    ", totalPrice, "   ", selectMonth);
             authenticate().then((authdata) => {
               console.log("!!!===== membership authdata   ", authdata.data);
               navigation.navigate('PayplePaymentScreen', {
@@ -156,30 +156,30 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
                       onPayment('카드', null, res.msg);
                     }else{
                       Alert.alert("결제에 실패하였습니다. ", res.msg);
+                      navigation.goBack();
                     }
                   }
               })
             }).catch((err) => {
               console.log(" !!!====== membership authdata error     ", err);
             })
-            // navigation.navigate('IamPortPayment', {
-            //   paymentMethod,
-            //   totalPrice,
-            //   onComplete: (res) => {
-            //     const { success, imp_uid, merchant_uid, error_msg } = res;
-            //     if (success) {
-            //       onCheckIamPortPayment(imp_uid);
-            //       // onPayment('카드');
-            //     } else {
-            //       Alert.alert('결제에 실패하였습니다.', error_msg);
-            //     }
-            //   },
-            // });
-          }
+          // navigation.navigate('IamPortPayment', {
+          //   paymentMethod,
+          //   totalPrice,
+          //   onComplete: (res) => {
+          //     const { success, imp_uid, merchant_uid, error_msg } = res;
+          //     if (success) {
+          //       onCheckIamPortPayment(imp_uid);
+          //       // onPayment('카드');
+          //     } else {
+          //       Alert.alert('결제에 실패하였습니다.', error_msg);
+          //     }
+          //   },
+          // });
         }
-        if (checkerdata.data.result == 1){
-          Alert.alert("이미 회원권이 존재합니다");
-        }
+      } else{
+        Alert.alert("이미 회원권이 존재합니다");
+      }
     }
   };
 
@@ -199,7 +199,6 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
     try {
       const { data } = await api.get(`products?gymId=${gym?.id}`);
       setProducts(data);
-      // console.log('products', data);
     } catch (e) {
       console.log(e);
       console.log(e.response);
@@ -212,7 +211,6 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
         `product-discounts?productId=${productId}&type=회원권`
       );
       setProductDiscounts(data);
-      // console.log('products', data);
     } catch (e) {
       console.log('e', e);
       console.log('e.res', e.response);

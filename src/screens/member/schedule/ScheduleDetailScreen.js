@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, View, StyleSheet, Image, Modal } from 'react-native';
+import { FlatList, View, StyleSheet, Image, Modal, Alert } from 'react-native';
 import Touchable from '../../../components/buttons/Touchable';
 import moment from 'moment';
 import MySchedule from '../../../components/MySchedule';
 import { NormalBoldLabel, NoneLabel } from '../../../components/Label';
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from '../../../constants/constants';
 import LessonReservationEditForm from '../../../components/scheduleclick/LessonReservationEditForm';
+import DropdownModal from '../../../components/dropdownModal';
+import ScheduleDeleteModal from '../../../components/modal/v3/scheduleDeleteModal';
+import api from '../../../api/api';
 
 const list = [{ type: '강습' }, { type: '방문' }];
 
@@ -14,26 +17,86 @@ const ScheduleDetailScreen = ({ navigation, route }) => {
   const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [isLessonEditOpen, setIsLessonEditOpen] = useState(false);
   const [isVisitReservation, setIsVistitReservation] = useState(false);
+  const [schedulesList, setSchedulesList] = useState(schedules);
 
+  //
+  //
+  const [locationX, setLocationX] = useState(null);
+  const [locationY, setLocationY] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [selectedContent, setSelectedContent] = useState(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  //
+  //
   useEffect(() => {
     navigation.setOptions({
       title: moment(selectedDate).format('YYYY년 M월 DD일'),
-
-      // headerRight: () =>
-      //   schedules.length === 0 && (
-      //     <Touchable onPress={() => navigation.navigate('ScheduleRegister')}>
-      //       <Image
-      //         style={styles.plusActionable}
-      //         source={require('../../../assets/images/Calendar/plus.png')}
-      //       />
-      //     </Touchable>
-      //   ),
     });
   }, []);
 
+  const onModalPress = () => {
+    setDeleteModalOpen(true);
+  };
+
+  const deleteSchedule = () => {
+    let alertMessage = '출석이 완료된 일정은 삭제할 수 없습니다.';
+    try {
+      if (selectedContent?.status !== '출석') {
+        const { data } = api.delete(`reservations/${selectedContent?.id}`);
+        setSchedulesList((prev) =>
+          prev.filter((data) => data !== selectedContent)
+        );
+        alertMessage = '일정이 삭제되었습니다.';
+      }
+      Alert.alert(alertMessage);
+      setDeleteModalOpen(false);
+    } catch (e) {
+      console.log(e);
+      console.log(e.response);
+      const { data } = e.response;
+      if (!data.ok && data.msg) {
+        Alert.alert('', data.msg);
+      }
+    }
+  };
   return (
     <>
+      {deleteModalOpen && (
+        <ScheduleDeleteModal
+          visible={deleteModalOpen}
+          onRequestClose={() => {
+            setDeleteModalOpen(false);
+          }}
+          onPress={() => {
+            deleteSchedule(selectedContent?.id);
+          }}
+          text={`[${selectedContent?.type ?? ''}]${
+            selectedContent.lessonName
+          } ${selectedContent.startTime.slice(
+            0,
+            5
+          )} ~ ${selectedContent.endTime.slice(0, 5)}`}
+        />
+      )}
       {/* 삭제 모달 */}
+      <DropdownModal
+        visible={
+          isDropdownOpen
+          // && selectedContent === id
+        }
+        x={locationX}
+        y={locationY + 5}
+        // hasFollowing={user?.hasFollowing}
+        onPress={(selectedText) => {
+          onModalPress();
+          // console.log('selectedText', selectedText);
+          setIsDropdownOpen(false);
+        }}
+        onClose={() => setIsDropdownOpen(false)}
+        CONTENT_POPUP={[{ id: 1, name: '삭제' }]}
+      />
+
       <Modal visible={isVisitReservation} transparent>
         <View style={styles.cancelModalCotainer}>
           <View style={styles.cancelModalFrame}>
@@ -103,7 +166,7 @@ const ScheduleDetailScreen = ({ navigation, route }) => {
         </View>
       </Modal>
 
-      {schedules.length === 0 && (
+      {schedulesList.length === 0 && (
         <View style={styles.center}>
           <Image
             source={require('../../../assets/icons/scheduleNull.png')}
@@ -115,10 +178,10 @@ const ScheduleDetailScreen = ({ navigation, route }) => {
           />
         </View>
       )}
-      {schedules.length > 0 && (
+      {schedulesList.length > 0 && (
         <FlatList
           style={styles.container}
-          data={schedules}
+          data={schedulesList}
           renderItem={({ item, index }) => (
             <MySchedule
               {...item}
@@ -128,6 +191,10 @@ const ScheduleDetailScreen = ({ navigation, route }) => {
               onDelete={() => setIsVistitReservation(true)}
               onModalOpenPress={() => setSelectedSchedule(index)}
               isModalActive={selectedSchedule === index}
+              setLocationX={setLocationX}
+              setLocationY={setLocationY}
+              setIsDropdownOpen={setIsDropdownOpen}
+              setSelectedContent={setSelectedContent}
             />
           )}
           keyExtractor={(item, idx) => item.id + idx.toString()}

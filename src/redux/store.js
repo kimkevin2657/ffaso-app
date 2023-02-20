@@ -9,7 +9,6 @@ import {
   PURGE,
   REGISTER,
 } from 'redux-persist';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import rootReducer from './rootReducer';
 
@@ -27,8 +26,8 @@ let middlewares = getDefaultMiddleware({
     })
 
 if (process.env.NODE_DEV !== 'production') {
-  // const createDebugger = require('redux-flipper').default;
-  // middlewares.push(createDebugger())
+  const createDebugger = require('redux-flipper').default;
+  middlewares.push(createDebugger())
 }
 
 const store = configureStore({

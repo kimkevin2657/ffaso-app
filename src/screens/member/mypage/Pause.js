@@ -40,7 +40,7 @@ const Pause = ({ navigation }) => {
 
   const onClickPause = async () => {
     if (selectedProduct?.length === 0 || selectedProduct === null) {
-      Alert.alert('회원권 및 수강권을 선택해주세요');
+      Alert.alert('회원권 또는 수강권을 선택해주세요');
       return;
     }
     if (

@@ -135,8 +135,9 @@ const TeacherCalendarCustom = ({ navigation, schedules }) => {
 
                     {Object.keys(schedules).length > 0 &&
                       schedules[moment(day).format('YYYY-MM-DD')]?.length > 0 &&
-                      schedules[moment(day).format('YYYY-MM-DD')].map(
-                        (schedule, i) => {
+                      schedules[moment(day).format('YYYY-MM-DD')]
+                        .slice(0, 1)
+                        .map((schedule, i) => {
                           if (i < 3) {
                             return (
                               <PlanBox
@@ -148,7 +149,7 @@ const TeacherCalendarCustom = ({ navigation, schedules }) => {
                                   numberOfLines={1}
                                   ellipsizeMode={'tail'}
                                 >
-                                    {`  ${schedule.type}`}
+                                  {`  ${schedule.type}`}
                                   {/*{`${schedule.type} ${*/}
                                   {/*  schedule?.lessonName*/}
                                   {/*    ? schedule?.lessonName*/}
@@ -193,8 +194,7 @@ const TeacherCalendarCustom = ({ navigation, schedules }) => {
                               </RowContainer>
                             );
                           }
-                        }
-                      )}
+                        })}
                   </DatesContainer>
                 );
               }

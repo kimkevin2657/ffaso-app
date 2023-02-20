@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
-  SafeAreaView,
   ScrollView,
   Image,
   StyleSheet,
   TouchableOpacity,
   Modal,
-  Dimensions,
   Alert,
+  Platform,
 } from 'react-native';
 import RowContainer from '../../components/containers/RowContainer';
 import {
@@ -21,14 +20,13 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import Touchable from '../../components/buttons/Touchable';
 import { LabelInput } from '../../components/input/Input';
 import BottomGradientButton from '../../components/buttons/BottomGradientButton';
-import { RadioButton } from 'react-native-paper';
 import ImagePicker from 'react-native-image-crop-picker';
 import api from '../../api/api';
 import { useSelector, useDispatch } from 'react-redux';
 import { resetNavigation } from '../../util';
 import { getGyms } from '../../redux/gymSlice';
 import { Container } from '../../components/containers/Container';
-import { SCREEN_WIDTH } from '../../constants/constants';
+import { isIos, SCREEN_WIDTH } from '../../constants/constants';
 import RadioButtons from '../../components/RadioButtonCustom/RadioButton';
 import { Wrapper } from '../../components/containers/Wrapper';
 
@@ -56,21 +54,22 @@ const CenterReviewWriting = ({ navigation, route }) => {
   useEffect(() => {
     navigation.setOptions({ title: `${gym?.name}` }, []);
   }, []);
+
   const addImg = () => {
     ImagePicker.openPicker({
       width: 600,
       height: 600,
-      mediaType: 'any',
+      mediaType: 'photo',
       cropperToolbarTitle: '이미지 등록',
       compressImageMaxWidth: 600,
       compressImageMaxHeight: 600,
     }).then((image) => {
       console.log('image', image);
-      let imageType =
+      const imageType =
         //`image/${{jpg: 'jpeg', jpeg: 'jpeg', png: 'png'}[image.path.split('.')[1]]}`
         `image/${image.path.split('.')[Platform.OS === 'ios' ? 1 : 2]}`;
 
-      let newImage = {
+      const newImage = {
         ...image,
         uri: image.path,
         name: `image_${new Date()}.${
@@ -175,7 +174,7 @@ const CenterReviewWriting = ({ navigation, route }) => {
 
       <ScrollView>
         <RowContainer style={styles.topRowContainer}>
-          <Touchable onPress={() => addImg()}>
+          <Touchable onPress={addImg}>
             <Image
               style={styles.centerReviewImg}
               source={

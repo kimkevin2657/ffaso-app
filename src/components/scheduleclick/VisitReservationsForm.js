@@ -351,7 +351,7 @@ const VisitReservationForm = ({ onReservation, coupon, gyms }) => {
               ? '쿠폰을 선택해주세요.'
               : !birthDate
               ? '날짜를 선택해주세요.'
-              : '이 날 해당하는 스케줄이 없습니다.'
+              : '이 날 해당하는 일정이 없습니다.'
           }
         />
 
@@ -439,6 +439,8 @@ const styles = StyleSheet.create({
   inputBox: {
     // width: 156,
     height: 40,
+    maxHeight: 40,
+    minHeight: 40,
     backgroundColor: '#fff',
     borderRadius: 10,
     borderWidth: 1,

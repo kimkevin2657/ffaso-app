@@ -1,3 +1,4 @@
+
 import axios from 'axios';
 import api from '../../../api/api';
 
@@ -26,7 +27,6 @@ export const authenticate = (obj = {}) => {
     const isDev = true;
 
     /*
-
     headers = {"Referer": data["url"]}
         res = requests.post(
             "https://democpay.payple.kr/php/auth.php", data=data, headers=headers

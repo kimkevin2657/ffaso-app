@@ -11,7 +11,7 @@ const ScheduleDelete = ({ setOpenModal }) => {
     <Container>
       <TopContainer>
         <NoneLabel
-          text={'방문 예약 삭제'}
+          text={'일정삭제'}
           style={{ fontSize: 18, fontWeight: 'bold' }}
         />
       </TopContainer>
@@ -22,7 +22,7 @@ const ScheduleDelete = ({ setOpenModal }) => {
           source={require('../../../assets/images/scheduleModal/deleteSchedule.png')}
         />
         <NormalBoldLabel12
-          text={'예약이 정상적으로 삭제 되었습니다.'}
+          text={'일정이 정상적으로 삭제 되었습니다'}
           style={{ color: '#000000', marginTop: 20 }}
         />
       </CenterContainer>

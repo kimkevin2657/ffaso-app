@@ -54,21 +54,37 @@ const ScheduleRegistration = ({ navigation }) => {
 
   const onPressSelectDate = useCallback(
     (value) => {
+      if (isSelectGym) {
+        Alert.alert('센터를 선택해주세요');
+        return;
+      }
+      if (startDate === null) {
+        Alert.alert('일정 시작일을 선택하세요.');
+        return;
+      }
+      if (endDate === null) {
+        Alert.alert('일정 종료일을 선택하세요.');
+        return;
+      }
       if (selectDate.includes(value)) {
         setSelectDate((prev) => prev.filter((data) => data !== value));
       } else {
         setSelectDate([...selectDate, value]);
       }
     },
-    [selectDate]
+    [selectDate, startDate, endDate, isSelectGym]
   );
 
   const fetchTicketList = async () => {
     try {
       const { data } = await api.get(`products?gymId=${selectCenter.gym}`);
+      const userDepartment = user?.department || '';
+      const lessonTicketList = data?.lessonTickets.filter(
+        (ticket) => ticket.department === userDepartment
+      );
 
-      setTicketList(data?.lessonTickets);
-      if (data?.lessonTickets?.length <= 0) {
+      setTicketList(lessonTicketList);
+      if (lessonTicketList?.length < 1) {
         Alert.alert('등록 가능한 수강권이 없습니다. 관리자에게 문의하세요');
       }
     } catch (e) {
@@ -78,18 +94,41 @@ const ScheduleRegistration = ({ navigation }) => {
       console.log(e);
     }
   };
+
+  const isExcludeAddSchedule = (
+    centerStartTime,
+    centerEndTime,
+    startTime,
+    endTime
+  ) => {
+    if (
+      centerStartTime > startTime ||
+      centerStartTime >= endTime ||
+      centerEndTime <= startTime ||
+      centerEndTime < endTime
+    ) {
+      Alert.alert(
+        `[${selectTicket?.name} 수강 ${centerStartTime.slice(
+          0,
+          5
+        )} ~ ${centerEndTime.slice(0, 5)}]`,
+        `센터 운영 시간 이외에 일정을 추가할 수 없습니다.`
+      );
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   const addScheduleList = () => {
     if (isSelectGym) {
       Alert.alert('센터를 선택해주세요');
       return;
-    }
-
-    if (selectTicket === null) {
+    } else if (selectTicket === null) {
       Alert.alert('일정 유형을 선택하세요.');
       return;
-    }
-    if (selectedStartTime === null) {
-      alert('일정 시작 시간을 선택하세요.');
+    } else if (selectedStartTime === null) {
+      Alert.alert('일정 시작 시간을 선택하세요.');
       return;
     }
 
@@ -99,63 +138,100 @@ const ScheduleRegistration = ({ navigation }) => {
       .format('HH:mm');
 
     if (
+      selectCenter?.weekendStartTime &&
+      selectCenter?.weekendEndTime &&
+      (selectDate.includes('토') || selectDate.includes('일'))
+    ) {
+      const { weekendStartTime, weekendEndTime } = selectCenter;
+      if (
+        isExcludeAddSchedule(
+          weekendStartTime,
+          weekendEndTime,
+          startTime,
+          endTime
+        )
+      ) {
+        return;
+      }
+    } else if (selectCenter?.weekdayStartTime && selectCenter?.weekdayEndTime) {
+      const { weekdayStartTime, weekdayEndTime } = selectCenter;
+      if (
+        isExcludeAddSchedule(
+          weekdayStartTime,
+          weekdayEndTime,
+          startTime,
+          endTime
+        )
+      ) {
+        return;
+      }
+    }
+
+    if (
       schedules?.some(
         (data) =>
           (startTime >= data.startTime && startTime < data.endTime) ||
           (endTime > data.startTime && endTime < data.endTime)
       )
     ) {
-      alert('이미 등록된 일정이 있습니다.');
+      Alert.alert('이미 등록된 일정이 있습니다.');
       return;
     }
 
-    let obj = {
+    const newSchedule = {
       startTime,
       endTime,
       selectTicket,
     };
-    setSchedules([...schedules, obj]);
+
+    const newSchedules = [...schedules, newSchedule].sort(
+      (a, b) => b.startTime - a.startTime
+    );
+
+    setSchedules(newSchedules);
   };
 
-  const onClickCreateSchedule = async (e) => {
+  const onClickCreateSchedule = async () => {
     if (startDate > endDate) {
-      alert('종료일을 시작일 이후로 입력해주세요');
-      return;
-    }
-    if (schedules.length <= 0) {
-      alert('추가한 일정이 없습니다.');
-      return;
-    }
-    let params = {
-      gymId: selectCenter.gym,
-      teacherId: user.id,
-      startDate: dayjs(startDate).format('YYYY-MM-DD'),
-      endDate: dayjs(endDate).format('YYYY-MM-DD'),
-      days: selectDate,
-      schedules,
-    };
+      Alert.alert('종료일을 시작일 이후로 입력해주세요');
+    } else if (schedules.length <= 0) {
+      Alert.alert('추가한 일정이 없습니다.');
+    } else if (selectDate.length <= 0) {
+      Alert.alert('선택한 요일이 없습니다');
+    } else {
+      const body = {
+        gymId: selectCenter.gym,
+        teacherId: user.id,
+        startDate: dayjs(startDate).format('YYYY-MM-DD'),
+        endDate: dayjs(endDate).format('YYYY-MM-DD'),
+        days: selectDate,
+        schedules,
+      };
 
-    try {
-      const { data } = await apiv3.post('teacher-current-schedules', params);
-      // toggle();
-      navigation.navigate('ScheduleRegistrationSelect', {
-        responseDates: data,
-        body: params,
-      });
-    } catch (e) {
-      if (e?.response?.data?.msg) {
-        alert(e.response.data.msg);
+      try {
+        const { data } = await apiv3.post('teacher-current-schedules', params);
+        navigation.navigate('ScheduleRegistrationSelect', {
+          responseDates: data,
+          body,
+        });
+      } catch (e) {
+        if (e?.response?.data?.msg) {
+          alert(e.response.data.msg);
+        }
       }
     }
-    // navigation.navigate('ScheduleRegistrationSelect');
   };
-
   useEffect(() => {
     if (Object.keys(selectCenter).length !== 0) {
       fetchTicketList();
-      setSchedules([]);
     }
   }, [selectCenter]);
+
+  useEffect(() => {
+    if (teacherGyms.length > 0 && Object.keys(selectCenter).length === 0) {
+      setSelectCenter(teacherGyms[0]);
+    }
+  }, []);
 
   const TipBox = ({ text }) => {
     return (
@@ -170,6 +246,7 @@ const ScheduleRegistration = ({ navigation }) => {
       </RowContainer>
     );
   };
+
   const today = new Date();
 
   return (
@@ -180,7 +257,7 @@ const ScheduleRegistration = ({ navigation }) => {
       }}
     >
       <TipBox
-        text={'Tip. 스케줄이 등록된 날짜에 여러개의 일정을 등록할 수 있습니다.'}
+        text={'Tip. 일정이 등록된 날짜에 여러개의 일정을 등록할 수 있습니다.'}
       />
       <View style={styles.centerBox}>
         <View style={{ position: 'relative' }}>
@@ -242,7 +319,11 @@ const ScheduleRegistration = ({ navigation }) => {
       <CenterListModal
         containerStyle={styles.inputBox}
         list={ticketList}
-        selectedItem={selectTicket?.name}
+        selectedItem={
+          selectTicket?.name
+            ? `[${selectTicket?.name} ${selectTicket?.time}분]`
+            : ''
+        }
         itemName={'name'}
         placeholder={'수강권을 선택하세요'}
         onPress={() => {
@@ -325,32 +406,34 @@ const ScheduleRegistration = ({ navigation }) => {
         <>
           <View style={styles.line} />
           <View style={styles.listView}>
-            {schedules?.map((data, index) => {
-              return (
-                <RowContainer
-                  style={{ ...styles.listMenu, marginBottom: 8 }}
-                  key={index}
-                >
-                  <NormalLabel13
-                    text={`${data.startTime} ~ ${data.endTime}`}
-                    style={{ color: '#555555', marginRight: 12 }}
-                  />
-                  <BoldLabel13
-                    text={`${data.selectTicket.name} (${data.selectTicket.time}분)`}
-                    style={styles.textColor}
-                  />
-                  <Touchable
-                    onPress={() => {
-                      setSchedules((prev) =>
-                        prev?.filter((list) => data !== list)
-                      );
-                    }}
+            {schedules
+              ?.sort((a, b) => a?.startTime > b?.startTime)
+              ?.map((data, index) => {
+                return (
+                  <RowContainer
+                    style={{ ...styles.listMenu, marginBottom: 8 }}
+                    key={index}
                   >
-                    <AntDesign name='close' size={18} color={'#FF0000'} />
-                  </Touchable>
-                </RowContainer>
-              );
-            })}
+                    <NormalLabel13
+                      text={`${data.startTime} ~ ${data.endTime}`}
+                      style={{ color: '#555555', marginRight: 12 }}
+                    />
+                    <BoldLabel13
+                      text={`${data.selectTicket.name} (${data.selectTicket.time}분)`}
+                      style={styles.textColor}
+                    />
+                    <Touchable
+                      onPress={() => {
+                        setSchedules((prev) =>
+                          prev?.filter((list) => data !== list)
+                        );
+                      }}
+                    >
+                      <AntDesign name='close' size={18} color={'#FF0000'} />
+                    </Touchable>
+                  </RowContainer>
+                );
+              })}
           </View>
           <View style={styles.line} />
         </>

@@ -52,7 +52,6 @@ const MemberCenterListScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     // return ()
-    handleDeepLink();
   }, []);
 
   useEffect(() => {
@@ -64,33 +63,6 @@ const MemberCenterListScreen = ({ navigation, route }) => {
       setSelectedFilterLabel('이용종목');
     }
   }, [route.params]);
-
-  const handleDeepLink = () => {
-    Linking.getInitialURL().then(res => { //앱이 실행되지 않은 상태에서 요청이 왔을 때
-      console.log(" !!!====== MemberCenterListScreen  handleDeepLink getInitlaURL     ", res);
-      console.log(" !!!====== MemberCenterListScreen  handleDeepLink getInitlaURL     ", res);
-      console.log(" !!!====== MemberCenterListScreen  handleDeepLink getInitlaURL     ", res);
-      // Alert.alert(" !!!====== MemberCenterListScreen  handleDeepLink getInitlaURL     ", JSON.stringify(res));
-      // if(res == null || res == undefined || res == ""){
-      //   return;
-      // }else{
-      //   var params = urlParamtersToJson(res);
-      //   console.log(" !!!======  handleDeepLink     ", params);
-      // }
-    });
-    Linking.addEventListener('url', (e) => {        // 앱이 실행되어있는 상태에서 요청이 왔을 때 처리하는 이벤트 등록
-      console.log(" !!!====== MemberCenterListScreen  handleDeepLink addEventListener     ", e);
-      console.log(" !!!====== MemberCenterListScreen  handleDeepLink getInitlaURL     ", e);
-      console.log(" !!!====== MemberCenterListScreen  handleDeepLink getInitlaURL     ", e);
-      // Alert.alert(" !!!====== MemberCenterListScreen  handleDeepLink getInitlaURL     ", JSON.stringify(e));
-      // var params = urlParamtersToJson(e.url); 
-      // if(e.url == null || e.url == undefined || e.url == ""){
-      //   return;
-      // }else{
-      //   console.log(" !!!======  handleDeepLink     ", params);
-      // }
-    });
-  }
 
   const sortGyms = (sortLabel) => {
     if (sortLabel === selectedFilterLabel) {

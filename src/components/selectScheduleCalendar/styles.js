@@ -17,6 +17,20 @@ export const DatesContainer = styled.View`
   align-items: center;
   justify-content: center;
 `;
+export const DisableDateCircle = styled.View`
+  width: 80%;
+  aspect-ratio: 1;
+  align-items: center;
+  justify-content: center;
+  border-radius: 30px;
+  //background-color: rgba(167, 171, 201, 0.15);
+  background-color: ${(props) =>
+    props.isActive
+      ? '#5EC762'
+      : props.isNotActive
+      ? '#FF5656'
+      : 'rgba(167, 171, 201, 0.15)'};
+`;
 export const DateCircle = styled.TouchableOpacity`
   width: 80%;
   aspect-ratio: 1;

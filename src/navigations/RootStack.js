@@ -27,7 +27,6 @@ import MembershipPaymentScreen from '../screens/member/payment/MembershipPayment
 import MemberCenterDetail from '../screens/centerDetail/MemberCenterDetail';
 import WorkingPlaceAdd from '../screens/teacher/WorkingPlaceAdd';
 import EtcCategoryScreen from '../screens/common/EtcCategoryScreen';
-import WorkTimeSetup from '../screens/teacher/WorkTimeSetup';
 import ShowAllReview from '../screens/centerDetail/Review/ShowAllReview';
 import ChatRoomDetailScreen from '../screens/common/ChatRoomDetailScreen';
 import Touchable from '../components/buttons/Touchable';
@@ -38,8 +37,8 @@ import TeacherCenterDetail from '../screens/centerDetail/TeacherCenterDetail';
 import TicketPaymentScreen from '../screens/member/payment/TicketPaymentScreen';
 import OptionPaymentScreen from '../screens/member/payment/OptionPaymentScreen';
 import TeacherScheduleDetailScreen from '../screens/teacher/TeacherScheduleDetailScreen';
+import PayplePaymentScreen from '../screens/member/payment/PayplePaymentScreen';
 // import IamPortPaymentScreen from '../screens/member/payment/IamPortPaymentScreen';
-import PayplePaymentScreen from '../screens/member/payment/PayplePaymentScreen'
 import FindRoadScreen from '../screens/common/FindRoadScreen';
 import ScheduleCouponsScreen from '../screens/member/schedule/ScheduleCouponsScreen';
 import AcademicsModify from '../screens/teacher/profileModify/AcademicsModify';
@@ -55,6 +54,7 @@ import ScheduleReservationUsersScreen from '../screens/teacher/ScheduleReservati
 import CeoInfoScreen from '../screens/common/CeoInfoScreen';
 import ScheduleRegistration from '../screens/teacher/ScheduleRegistration';
 import ScheduleRegistrationSelect from '../screens/teacher/ScheduleRegistrationSelect';
+import MemberSelectSchedule from '../screens/member/v3/MemberSelectSchedule';
 
 const Stack = createNativeStackNavigator();
 
@@ -157,6 +157,8 @@ const RootStack = () => (
       component={ScheduleCouponsScreen}
       options={{ title: '쿠폰&프로모션' }}
     />
+
+    {/* 일반회원의 스케줄상세 */}
     <Stack.Screen
       name='ScheduleDetail'
       component={ScheduleDetailScreen}
@@ -301,11 +303,6 @@ const RootStack = () => (
       options={{ title: '기타종목' }}
     />
     <Stack.Screen
-      name='WorkTimeSetup'
-      component={WorkTimeSetup}
-      options={{ title: '스케줄 등록' }}
-    />
-    <Stack.Screen
       name='ShowAll'
       component={ShowAllReview}
       options={{ title: '빠소센터' }}
@@ -355,6 +352,11 @@ const RootStack = () => (
       name='ScheduleRegistrationSelect'
       component={ScheduleRegistrationSelect}
       options={{ title: '일정 선택' }}
+    />
+    <Stack.Screen
+      name='MemberSelectSchedule' //쿠폰 or 수강신청 선
+      component={MemberSelectSchedule}
+      options={{ title: '쿠폰 일정 선택' }}
     />
   </Stack.Navigator>
 );

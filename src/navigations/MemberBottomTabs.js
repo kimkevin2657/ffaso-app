@@ -17,7 +17,6 @@ const TabBarIcon = ({ isFocus, focusImage, unFocusImage }) => {
 };
 
 export const MemberBottomTabs = () => {
-
   return (
     <Tab.Navigator
       tabBar={(props) => <MemberBottomTabBar {...props} />}
@@ -63,7 +62,7 @@ export const MemberBottomTabs = () => {
         component={MemberSchedulesScreen}
         options={{
           // headerShown: false,
-          title: '스케줄러',
+          title: '일정',
           // headerTitleAlign: 'center',
         }}
       />

@@ -13,6 +13,10 @@ export const nestingNavigate = (navigation, path1, path2, params) => {
   navigation.navigate(path1, { screen: path2, params });
 };
 
+export const nestingNavigateReplace = (navigation, path1, path2, params) => {
+  navigation.replace(path1, { screen: path2, params });
+};
+
 export const resetNavigation = (navigation, path) => {
   const reset = CommonActions.reset({
     index: 0,

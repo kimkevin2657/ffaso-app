@@ -82,7 +82,7 @@ export const TeacherBottomTabs = () => {
         name='TeacherSchedule'
         component={TeacherSchedulesScreen}
         options={{
-          title: '스케줄러',
+          title: '일정',
           // tabBarIcon: ({ focused }) => (
           //   <TabBarIcon
           //     isFocus={focused}

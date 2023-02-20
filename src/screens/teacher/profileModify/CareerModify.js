@@ -127,7 +127,7 @@ const CareerModify = ({ navigation, route }) => {
   };
 
   return (
-    <View style={{ flex: 1, marginBottom: 25 }}>
+    <View style={{ flex: 1, paddingBottom: 25, backgroundColor: '#fff' }}>
       <ScrollView
         style={{
           paddingHorizontal: 24,
@@ -359,6 +359,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     textAlign: 'center',
     color: '#000',
+    height: 40,
   },
 });
 

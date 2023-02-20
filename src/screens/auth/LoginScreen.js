@@ -159,7 +159,7 @@ const LoginScreen = ({ navigation }) => {
                 onPress={() => setIsVisible1(!isVisible1)}
               >
                 <Ionicons
-                  name={isVisible1 ? 'eye' : 'eye-off'}
+                  name={isVisible1 ? 'eye-outline' : 'ios-eye-off-outline'}
                   size={30}
                   color={'#8082FF'}
                   style={{ marginTop: 10 }}

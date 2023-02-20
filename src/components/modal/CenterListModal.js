@@ -31,7 +31,9 @@ const CenterListModal = ({
       <TouchableOpacity
         onPress={() => {
           if (disabled) {
-            Alert.alert('', disableMsg);
+            if (disableMsg) {
+              Alert.alert('', disableMsg);
+            }
             return;
           }
           onPress();

@@ -9,6 +9,8 @@ import SpaceBetweenContainer from './containers/SpaceBetweenContainer';
 import { Container } from './containers/Container';
 
 const Gym = (props) => {
+  const { title } = props;
+
   return (
     <Container>
       <RowContainer style={{ marginVertical: 16 }}>
@@ -25,10 +27,10 @@ const Gym = (props) => {
           <SpaceBetweenContainer style={{ alignItems: 'flex-start' }}>
             <RowContainer style={{ flex: 1 }}>
               <NormalBoldLabel
-                text={props.title}
+                text={title.length > 8 ? title.slice(0, 8) + '...' : title}
                 style={styles.title}
-                numberOfLines={1}
-                ellipsizeMode={'tail'}
+                // numberOfLines={1}
+                // ellipsizeMode={'tail'}
               />
             </RowContainer>
             <View>

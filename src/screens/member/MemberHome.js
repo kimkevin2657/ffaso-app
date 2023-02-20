@@ -11,7 +11,6 @@ import {
   Platform,
   PermissionsAndroid,
   Linking,
-  Alert
 } from 'react-native';
 import { NormalLabel } from '../../components/Label';
 import RowContainer from '../../components/containers/RowContainer';
@@ -50,7 +49,6 @@ const MemberHome = ({ navigation }) => {
     dispatch(getGyms());
     getCurrentPoint();
     getRecommendContents();
-    handleDeepLink();
   }, []);
 
   const onSearchGym = () => {
@@ -99,33 +97,6 @@ const MemberHome = ({ navigation }) => {
     }
   };
 
-  const handleDeepLink = () => {
-    Linking.getInitialURL().then(res => { //앱이 실행되지 않은 상태에서 요청이 왔을 때
-      console.log(" !!!====== MemberHome  handleDeepLink getInitlaURL     ", res);
-      console.log(" !!!====== MemberHome  handleDeepLink getInitlaURL     ", res);
-      console.log(" !!!====== MemberHome  handleDeepLink getInitlaURL     ", res);
-      // Alert.alert(" !!!====== MemberHome  handleDeepLink getInitlaURL     ", JSON.stringify(res));
-      // if(res == null || res == undefined || res == ""){
-      //   return;
-      // }else{
-      //   var params = urlParamtersToJson(res);
-      //   console.log(" !!!======  handleDeepLink     ", params);
-      // }
-    });
-    Linking.addEventListener('url', (e) => {        // 앱이 실행되어있는 상태에서 요청이 왔을 때 처리하는 이벤트 등록
-      console.log(" !!!====== MemberHome  handleDeepLink addEventListener     ", e);
-      console.log(" !!!====== MemberHome  handleDeepLink getInitlaURL     ", e);
-      console.log(" !!!====== MemberHome  handleDeepLink getInitlaURL     ", e);
-      // Alert.alert(" !!!====== MemberHome  handleDeepLink getInitlaURL     ", JSON.stringify(e));
-      // var params = urlParamtersToJson(e.url); 
-      // if(e.url == null || e.url == undefined || e.url == ""){
-      //   return;
-      // }else{
-      //   console.log(" !!!======  handleDeepLink     ", params);
-      // }
-    });
-  }
-
   const getRecommendContents = async () => {
     try {
       const { data } = await api.get('recommend-contents?type=일반');
@@ -139,18 +110,13 @@ const MemberHome = ({ navigation }) => {
 
   return (
     <Container>
-      {/* <ScrollView
+      <ScrollView
         contentContainerStyle={{ paddingBottom: 50 }}
         style={[
           styles.container,
           // {backgroundColor: isModalOn ? 'lightgray' : 'none'},
         ]}
-      > */}
-      <View 
-        style={[
-          styles.container,
-
-        ]}>
+      >
         <View style={{ flex: 1 }}>
           <SpaceBetweenContainer style={{ paddingHorizontal: 24 }}>
             <Touchable onPress={() => navigation.openDrawer()}>
@@ -322,8 +288,7 @@ const MemberHome = ({ navigation }) => {
             </ScrollView>
           </View>
         </View>
-        </View>
-      {/* </ScrollView> */}
+      </ScrollView>
     </Container>
   );
 };

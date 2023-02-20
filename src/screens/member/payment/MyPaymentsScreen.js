@@ -174,6 +174,7 @@ const PaymentHistory = ({
   getProductName,
   price,
   gymName,
+  status,
 }) => {
   return (
     <RowContainer
@@ -207,7 +208,9 @@ const PaymentHistory = ({
           style={{ fontSize: 12, lineHeight: 15, color: '#555' }}
         />
         <NormalBoldLabel
-          text={`+ ₩${commaNum(price)}`}
+          text={`+ ₩${commaNum(price)} ${
+            status === '결제대기' ? '(승인대기)' : ''
+          }`}
           style={{ fontSize: 12, lineHeight: 15, color: '#555', marginTop: 4 }}
         />
       </ColumnView>
@@ -219,6 +222,7 @@ const RefundHistory = ({
   createdAt,
   type,
   refundPrice,
+  usedPrice,
   gymName,
   membershipPayment,
   ticketPayment,
@@ -257,7 +261,8 @@ const RefundHistory = ({
           style={{ fontSize: 12, lineHeight: 15, color: '#555' }}
         />
         <NormalBoldLabel
-          text={`+ ₩${commaNum(refundPrice)}`}
+          text={`+ ₩${commaNum(refundPrice + usedPrice)}`}
+          // text={`+ ₩${commaNum(refundPrice)}`}
           style={{ fontSize: 12, lineHeight: 15, color: '#555', marginTop: 4 }}
         />
       </ColumnView>

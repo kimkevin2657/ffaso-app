@@ -23,12 +23,12 @@ import {
 } from '../../../constants/paymentInfos';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { MONTHS, SCREEN_WIDTH } from '../../../constants/constants';
+import { MONTHS } from '../../../constants/constants';
 import CenterListModal from '../../../components/modal/CenterListModal';
 import { authenticate } from './payple';
 
 const OptionPaymentScreen = ({ navigation, route }) => {
-  const { user, token } = useSelector((state) => state.auth);
+  const { token } = useSelector((state) => state.auth);
   const { gym } = route.params;
 
   const [selectedOption, setSelectedOption] = useState(null);
@@ -36,7 +36,6 @@ const OptionPaymentScreen = ({ navigation, route }) => {
   const [optionDate, setOptionDate] = useState(new Date());
   const [isOptionDatePickerOpen, setIsOptionDatePickerOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('현금'); // or 'card'
-  const [oid, setOID] = useState('');
   const [termInfoOpen, setTermInfoOpen] = useState({
     PRODUCT: false,
     DEAL: false,
@@ -62,7 +61,7 @@ const OptionPaymentScreen = ({ navigation, route }) => {
     getProducts();
   }, []);
 
-  const onPayment = async (paymentMethod, hasCashReceipt, oid) => {
+  const onPayment = async (paymentMethod, hasCashReceipts, oid) => {
     try {
       const config = {
         headers: {
@@ -70,16 +69,18 @@ const OptionPaymentScreen = ({ navigation, route }) => {
         },
       };
 
-      let endDate = new Date(optionDate.getTime());
+      const endDate = new Date(optionDate.getTime());
+      const availableEndDate = new Date(
+        endDate.setMonth(optionDate.getMonth() + Number(selectedOptionMonth))
+      );
       const newEndDate = moment(
-        new Date(
-          endDate.setMonth(optionDate.getMonth() + Number(selectedOptionMonth))
-        )
+        availableEndDate.setDate(availableEndDate.getDate() - 1)
       ).format('YYYY-MM-DD');
-      const price =
-        !hasCashReceipts && selectedOption?.hasCashDiscount
-          ? totalPrice * 0.9
-          : totalPrice;
+
+      const price = totalPrice;
+      // !hasCashReceipts && selectedOption?.hasCashDiscount
+      //   ? totalPrice * 0.9
+      //   : totalPrice;
 
       const body = {
         option: selectedOption?.id,
@@ -94,11 +95,7 @@ const OptionPaymentScreen = ({ navigation, route }) => {
       if (selectedProductDetailId) {
         body.productDetail = selectedProductDetailId;
       }
-      // console.log('body', body);
-      console.log( "!!!!!============ option-rental api.post  body   ", body);
-      console.log( "!!!!!============ option-rental api.post  config   ", config);
       await api.post(`option-rental/`, body, config);
-      // console.log('res', res);
       Alert.alert('결제가 완료되었습니다.');
       resetNavigation(navigation, 'MemberMain');
     } catch (e) {
@@ -106,7 +103,6 @@ const OptionPaymentScreen = ({ navigation, route }) => {
       console.log('e.res', e.response);
       if (e.response?.data && e.response?.data?.msg) {
         Alert.alert(e.response?.data?.msg);
-        resetNavigation(navigation, 'MemberMain');
       }
     }
   };
@@ -159,6 +155,7 @@ const OptionPaymentScreen = ({ navigation, route }) => {
                       onPayment('카드', null, res.msg);
                     }else{
                       Alert.alert("결제에 실패하였습니다. ", res.msg);
+                      navigation.goBack();
                     }
                   }
               })
@@ -178,9 +175,9 @@ const OptionPaymentScreen = ({ navigation, route }) => {
             //   },
             // });
           }
-        }
-        if (checkerdata.data.result == 1){
-              Alert.alert("이미 옵션권이 존재합니다");
+
+        } else{
+          Alert.alert("이미 옵션권이 존재합니다");
         }
     }
   };
@@ -201,7 +198,6 @@ const OptionPaymentScreen = ({ navigation, route }) => {
     try {
       const { data } = await api.get(`products?gymId=${gym.id}`);
       setProducts(data);
-      // console.log('products', data);
     } catch (e) {
       console.log(e);
       console.log(e.response);
@@ -214,7 +210,6 @@ const OptionPaymentScreen = ({ navigation, route }) => {
         `product-discounts?productId=${productId}&type=옵션`
       );
       setProductDiscounts(data);
-      // console.log('products', data);
     } catch (e) {
       console.log('e', e);
       console.log('e.res', e.response);

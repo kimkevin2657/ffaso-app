@@ -75,7 +75,7 @@ const RefundDetailScreen = ({ navigation, route: { params } }) => {
       });
       console.log('data', data);
 
-      Alert.alert('환불을 완료하였습니다');
+      Alert.alert('환불을 완료하였습니다.');
       resetNavigation(navigation, 'MemberMain');
     } catch (err) {
       console.log('err', err);

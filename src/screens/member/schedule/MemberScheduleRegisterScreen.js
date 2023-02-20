@@ -5,6 +5,7 @@ import VisitReservationsForm from '../../../components/scheduleclick/VisitReserv
 import api from '../../../api/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetNavigation } from '../../../util';
+import LessonReservationFormV3 from '../../../components/scheduleclick/v3/LessonReservationFormV3';
 
 const MemberScheduleRegisterScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
@@ -80,20 +81,29 @@ const MemberScheduleRegisterScreen = ({ navigation, route }) => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      {reservationType === '강습' ? (
-        <LessonReservationForm
-          gyms={gyms}
-          coupon={coupon}
-          onReservation={(data, type) => onReservation(data, type)}
-        />
-      ) : (
-        <VisitReservationsForm
-          gyms={gyms}
-          coupon={coupon}
-          onReservation={(data, type) => onReservation(data, type)}
-        />
-      )}
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ flexGrow: 1 }}
+    >
+      <LessonReservationFormV3
+        gyms={gyms}
+        coupon={coupon}
+        onReservation={(data, type) => onReservation(data, type)}
+        isCouponType={reservationType !== '강습'}
+      />
+      {/*{reservationType === '강습' ? (*/}
+      {/*  <LessonReservationForm*/}
+      {/*    gyms={gyms}*/}
+      {/*    coupon={coupon}*/}
+      {/*    onReservation={(data, type) => onReservation(data, type)}*/}
+      {/*  />*/}
+      {/*) : (*/}
+      {/*  <VisitReservationsForm*/}
+      {/*    gyms={gyms}*/}
+      {/*    coupon={coupon}*/}
+      {/*    onReservation={(data, type) => onReservation(data, type)}*/}
+      {/*  />*/}
+      {/*)}*/}
     </ScrollView>
   );
 };
@@ -103,5 +113,6 @@ export default MemberScheduleRegisterScreen;
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fbfbfb',
+    paddingBottom: 25,
   },
 });

@@ -1,15 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  ScrollView,
-  Alert,
-} from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, StyleSheet, Image, ScrollView, Alert } from 'react-native';
 import { NormalBoldLabel } from '../../../components/Label';
-import ColumnView from '../../../components/ColumnView';
 import api from '../../../api/api';
 import { useSelector } from 'react-redux';
 import { Container } from '../../../components/containers/Container';
@@ -48,33 +39,6 @@ const ScheduleCouponsScreen = ({ navigation, route }) => {
     }
     onComplete(coupon);
     navigation.goBack();
-  };
-
-  const onUseCoupon = async (coupon) => {
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Token ${token}`,
-      },
-    };
-
-    try {
-      const { data } = await api.post(
-        `user-coupons/${coupon.id}/use/`,
-        '',
-        config
-      );
-      // console.log('uesCoupon data', data);
-      Alert.alert(data.msg);
-      getCouponList();
-    } catch (err) {
-      console.log('useCoupon err ', err);
-      console.log('useCoupon err.response', err.response);
-      if (err.response?.data) {
-        const { data } = err.response;
-        Alert.alert('', data.msg);
-      }
-    }
   };
 
   return (

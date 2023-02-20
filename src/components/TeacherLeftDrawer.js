@@ -114,11 +114,10 @@ const TeacherLeftDrawer = ({ navigation }) => {
                   style={styles.sceduleContainer}
                   onPress={() => {
                     navigation.closeDrawer();
-                    // navigation.navigate('WorkTimeSetup');
                     navigation.navigate('ScheduleRegistration');
                   }}
                 >
-                  <Text style={styles.enrollProflie}>스케줄 등록</Text>
+                  <Text style={styles.enrollProflie}>일정 등록</Text>
                 </TouchableOpacity>
               </SpaceBetweenContainer>
             </View>

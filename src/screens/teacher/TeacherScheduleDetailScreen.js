@@ -30,6 +30,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import BottomGradientButton from '../../components/buttons/BottomGradientButton';
 import RowContainer from '../../components/containers/RowContainer';
 import ScheduleDeleteModal from '../../components/modal/v3/scheduleDeleteModal';
+import apiv3 from '../../api/apiv3';
 
 const TeacherScheduleDetailScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
@@ -40,7 +41,6 @@ const TeacherScheduleDetailScreen = ({ navigation, route }) => {
   const [isVisitReservation, setIsVistitReservation] = useState(false);
   const [schedulesList, setSchedulesList] = useState(schedules);
 
-  //
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedContent, setSelectedContent] = useState(null);
   const [locationX, setLocationX] = useState(null);
@@ -48,17 +48,20 @@ const TeacherScheduleDetailScreen = ({ navigation, route }) => {
   const [openModal, setOpenModal] = useState(false);
   const [selectText, setSelectText] = useState('');
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  //
+
   const onModalPress = (selectedText) => {
-    if (selectedText === '삭제') {
+    const now = moment().format('YYYY-MM-DD');
+    if (now > selectedDate) {
+      Alert.alert('지난 일정은\n수정/삭제가 불가능합니다.');
+      return;
+    } else if (selectedText === '삭제') {
       setDeleteModalOpen(true);
-      // deleteSchedule(selectedContent?.id);
     } else if (selectedText === '수정') {
       setOpenModal(true);
     }
     setSelectText(selectedText);
   };
-  //스케줄 삭제
+
   const deleteSchedule = async (contentId) => {
     try {
       const { data } = api.delete(`schedules?id=${contentId}`);
@@ -76,7 +79,6 @@ const TeacherScheduleDetailScreen = ({ navigation, route }) => {
       }
     }
   };
-  //스케줄 변경
 
   const updateSchedule = async (body) => {
     if (body.startTime >= body.endTime) {
@@ -102,7 +104,9 @@ const TeacherScheduleDetailScreen = ({ navigation, route }) => {
     try {
       const { data } = isScheduleTypeChange
         ? await api.post(`teacher-status`, params)
-        : await api.patch(`schedules/${selectedContent?.id}/`, body);
+        : await apiv3.patch(`teacher-schedule-register`, body);
+
+      // await api.patch(`schedules/${selectedContent?.id}/`, body);
 
       // console.log(isScheduleTypeChange, data, params);
 
@@ -168,7 +172,6 @@ const TeacherScheduleDetailScreen = ({ navigation, route }) => {
         <Touchable
           onPress={() => {
             navigation.navigate('ScheduleRegistration');
-            // navigation.navigate('WorkTimeSetup')
           }}
         >
           <Image
@@ -181,7 +184,6 @@ const TeacherScheduleDetailScreen = ({ navigation, route }) => {
   }, []);
 
   const onNavigateRegisterSchedule = useCallback(() => {
-    // navigation.navigate('WorkTimeSetup');
     navigation.navigate('ScheduleRegistration');
   }, []);
 
@@ -203,9 +205,7 @@ const TeacherScheduleDetailScreen = ({ navigation, route }) => {
           onRequestClose={() => {
             setDeleteModalOpen(false);
           }}
-          onPress={() => {
-            deleteSchedule(selectedContent?.id);
-          }}
+          onPress={() => deleteSchedule(selectedContent?.id)}
           text={`[수강]${
             selectedContent.lessonName
           } ${selectedContent.startTime.slice(
@@ -255,7 +255,7 @@ const TeacherScheduleDetailScreen = ({ navigation, route }) => {
             <View
               style={{ borderBottomColor: '#E3E5E5', borderBottomWidth: 1 }}
             >
-              <NoneLabel text={'스케줄 삭제'} style={styles.cancelModalTitle} />
+              <NoneLabel text={'일정 삭제'} style={styles.cancelModalTitle} />
             </View>
             <View
               style={{
@@ -275,7 +275,7 @@ const TeacherScheduleDetailScreen = ({ navigation, route }) => {
                 }}
               />
               <NoneLabel
-                text={'스케줄이 정상적으로 삭제되었습니다.'}
+                text={'일정이 정상적으로 삭제되었습니다.'}
                 style={{
                   color: '#000000',
                   fontWeight: 'bold',

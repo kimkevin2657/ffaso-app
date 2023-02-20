@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, StyleSheet, Image, Alert } from 'react-native';
+import { View, Text, StyleSheet, Image, Alert } from 'react-native';
 import ColumnView from '../../../components/ColumnView';
 import NearbyCenterTop from '../../../components/nearbyCenter/NearbyCenterTop';
 import RowContainer from '../../../components/containers/RowContainer';
@@ -18,7 +18,7 @@ import { useSelector } from 'react-redux';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Container } from '../../../components/containers/Container';
-import { SCREEN_WIDTH, TICKET_COUNTS } from '../../../constants/constants';
+import { TICKET_COUNTS } from '../../../constants/constants';
 import {
   DEAL_INFO,
   PRODUCT_INFO,
@@ -26,7 +26,6 @@ import {
 } from '../../../constants/paymentInfos';
 import CenterListModal from '../../../components/modal/CenterListModal';
 import { authenticate } from './payple';
-
 
 const TicketPaymentScreen = ({ navigation, route }) => {
   const { user, token } = useSelector((state) => state.auth);
@@ -48,7 +47,6 @@ const TicketPaymentScreen = ({ navigation, route }) => {
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [productDiscounts, setProductDiscounts] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
-  const [oid, setOID] = useState('');
   const [modalOpen, setModalOpen] = useState({
     product: false,
     teacher: false,
@@ -75,16 +73,18 @@ const TicketPaymentScreen = ({ navigation, route }) => {
         },
       };
 
-      let endDate = new Date(ticketDate.getTime());
+      const endDate = new Date(ticketDate.getTime());
+      const availableEndDate = new Date(
+        endDate.setMonth(ticketDate.getMonth() + Number(selectedTicketMonth))
+      );
       const newEndDate = moment(
-        new Date(
-          endDate.setMonth(ticketDate.getMonth() + Number(selectedTicketMonth))
-        )
+        availableEndDate.setDate(availableEndDate.getDate() - 1)
       ).format('YYYY-MM-DD');
-      const price =
-        !hasCashReceipts && selectedTicket.hasCashDiscount
-          ? totalPrice * 0.9
-          : totalPrice;
+
+      const price = totalPrice;
+      // !hasCashReceipts && selectedTicket.hasCashDiscount
+      //   ? totalPrice * 0.9
+      //   : totalPrice;
 
       const body = {
         ticketName: selectedTicket?.name,
@@ -104,8 +104,6 @@ const TicketPaymentScreen = ({ navigation, route }) => {
         body.productDetail = selectedProductDetailId;
       }
       // console.log('body', body);
-      console.log( "!!!!!============ lessonTicket-payment api.post  body   ", body);
-      console.log( "!!!!!============ lessonTicket-payment api.post  config   ", config);
       await api.post(`lessonTicket-payment/`, body, config);
       // console.log('res', res);
       Alert.alert('결제가 완료되었습니다.');
@@ -115,7 +113,6 @@ const TicketPaymentScreen = ({ navigation, route }) => {
       console.log('e.res', e.response);
       if (e.response?.data && e.response?.data?.msg) {
         Alert.alert(e.response?.data?.msg);
-        resetNavigation(navigation, 'MemberMain');
       }
     }
   };
@@ -139,57 +136,51 @@ const TicketPaymentScreen = ({ navigation, route }) => {
     } else if (!selectedTeacher) {
       Alert.alert('강사를 선택해주세요.');
     } else {
-      // var checkerdata = await apiv3.post('lesson-exist-checker', {ticketId: selectedTicket?.id, userId: user?.id}, {headers: {Authorization: `Token ${token}`,},});
-      // if (checkerdata.data.result == 1){
-          if (paymentMethod === '현금') {
-            Alert.alert('현금영수증이 필요하신가요?', '', [
-              {
-                text: '아니오',
-                onPress: () => onPayment('현금', false),
-              },
-              { text: '예', onPress: () => onPayment('현금', true) },
-            ]);
-          } else if (paymentMethod === 'card') {
-            console.log(" !!!==========  ticket card payment    ", totalPrice, "   ");
-            authenticate().then((authdata) => {
-              console.log("!!!===== membership authdata   ", authdata.data);
-              const selectNoblesss = selectedTicket;
-              navigation.navigate('PayplePaymentScreen', {
-                  paymentMethod,
-                  totalPrice,
-                  authdata,
-                  gym,
-                  selectNoblesss,
-                  onComplete: (res) => {
-                    console.log("!!!!!======== membership Payple onComplete res    ", res);
-                    if (res.status == true){
-                      setOID(res.msg);
-                      onPayment('카드', null, res.msg);
-                    }else{
-                      Alert.alert("결제에 실패하였습니다. ", res.msg);
-                    }
-                  }
-              })
-            }).catch((err) => {
-              console.log(" !!!====== membership authdata error     ", err);
-            })
-            // navigation.navigate('IamPortPayment', {
-            //   paymentMethod,
-            //   onComplete: (res) => {
-            //     const { success, imp_uid, merchant_uid, error_msg } = res;
-            //     if (success) {
-            //       onCheckIamPortPayment(imp_uid);
-            //       // onPayment('카드');
-            //     } else {
-            //       Alert.alert('결제에 실패하였습니다.', error_msg);
-            //     }
-            //   },
-            // });
-          }
-      // }
-      // if (checkerdata.data.result == 0){
-      //     Alert.alert("이미 수강권이 존재합니다");
-      // }
+      if (paymentMethod === '현금') {
+        Alert.alert('현금영수증이 필요하신가요?', '', [
+          {
+            text: '아니오',
+            onPress: () => onPayment('현금', false),
+          },
+          { text: '예', onPress: () => onPayment('현금', true) },
+        ]);
+      } else if (paymentMethod === 'card') {
+        authenticate().then((authdata) => {
+          console.log("!!!===== membership authdata   ", authdata.data);
+          const selectNoblesss = selectedTicket;
+          navigation.navigate('PayplePaymentScreen', {
+              paymentMethod,
+              totalPrice,
+              authdata,
+              gym,
+              selectNoblesss,
+              onComplete: (res) => {
+                console.log("!!!!!======== membership Payple onComplete res    ", res);
+                if (res.status == true){
+                  setOID(res.msg);
+                  onPayment('카드', null, res.msg);
+                }else{
+                  Alert.alert("결제에 실패하였습니다. ", res.msg);
+                  navigation.goBack();
+                }
+              }
+          })
+        }).catch((err) => {
+          console.log(" !!!====== membership authdata error     ", err);
+        })
+        // navigation.navigate('IamPortPayment', {
+        //   paymentMethod,
+        //   onComplete: (res) => {
+        //     const { success, imp_uid, merchant_uid, error_msg } = res;
+        //     if (success) {
+        //       onCheckIamPortPayment(imp_uid);
+        //       // onPayment('카드');
+        //     } else {
+        //       Alert.alert('결제에 실패하였습니다.', error_msg);
+        //     }
+        //   },
+        // });
+      }
     }
   };
 
@@ -209,7 +200,6 @@ const TicketPaymentScreen = ({ navigation, route }) => {
     try {
       const { data } = await api.get(`products?gymId=${gym.id}`);
       setProducts(data);
-      // console.log('products', data);
     } catch (e) {
       console.log(e);
       console.log(e.response);
@@ -246,7 +236,6 @@ const TicketPaymentScreen = ({ navigation, route }) => {
         `product-discounts?productId=${productId}&type=수강권`
       );
       setProductDiscounts(data);
-      // console.log('products', data);
     } catch (e) {
       console.log('e', e);
       console.log('e.res', e.response);

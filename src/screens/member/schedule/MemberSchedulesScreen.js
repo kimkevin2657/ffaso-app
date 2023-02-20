@@ -29,7 +29,7 @@ const MemberSchedulesScreen = ({ navigation }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      title: '스케줄러',
+      // title: '스케줄러',
       headerTitleAlign: 'center',
       headerStyle: {
         // backgroundColor: '#FBFBFB',

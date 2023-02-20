@@ -25,7 +25,7 @@ const PopupBtn = styled.TouchableOpacity`
   border-color: #e3e5e5;
 `;
 
-const CONTENT_POPUP = [
+const dataList = [
   { id: 1, name: '수정' },
   { id: 2, name: `삭제` },
 ];
@@ -38,6 +38,7 @@ const DropdownModal = ({
   x,
   y,
   hasFollowing,
+  CONTENT_POPUP = dataList,
 }) => {
   return (
     <Modal visible={visible} transparent onRequestClose={onClose}>

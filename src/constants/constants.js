@@ -8,6 +8,7 @@ export const ORDER_LABELS = ['이용종목', '강습', '거리'];
 export const MEMBER_SCHEDULE_COLOR = {
   방문: '#53C7FF',
   강습: '#91CD87',
+  쿠폰: '#AE87CD',
 };
 
 export const TEACHER_TYPE_COLOR = {

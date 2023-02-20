@@ -10,11 +10,17 @@ import {
   DateNumber,
   DatesContainer,
   Days,
+  DisableDateCircle,
   SelectText,
 } from './styles';
 import dayjs from 'dayjs';
 
-const SelectScheduleCalendar = ({ responseDates, onClickUnavailableDate }) => {
+const SelectScheduleCalendar = ({
+  responseDates,
+  onClickUnavailableDate,
+  body,
+}) => {
+  const datesList = body?.days;
   const acceptDates = responseDates?.possibleDates;
   const notAcceptDates = responseDates?.imPossibleDates;
 
@@ -40,16 +46,21 @@ const SelectScheduleCalendar = ({ responseDates, onClickUnavailableDate }) => {
           {Array(7)
             .fill(0)
             .map((data, index) => {
+              const isIncludeDate = datesList.includes(Dates[index]);
               let days = today
                 .clone()
                 .startOf('year')
                 .week(week)
                 .startOf('week')
                 .add(index, 'day');
+              const isBetweenData =
+                body.startDate <= days.format('YYYY-MM-DD') &&
+                days.format('YYYY-MM-DD') <= body.endDate;
               if (days.format('MM') !== today.format('MM')) {
+                //  지난달 or 다음달
                 return (
                   <DatesContainer key={index} height={window_height}>
-                    <DateCircle>
+                    <DisableDateCircle>
                       <DateNumber
                         color={'#CACCD6'}
                         isToday={false}
@@ -59,7 +70,24 @@ const SelectScheduleCalendar = ({ responseDates, onClickUnavailableDate }) => {
                       >
                         {days.format('D')}
                       </DateNumber>
-                    </DateCircle>
+                    </DisableDateCircle>
+                  </DatesContainer>
+                );
+              } else if (!isBetweenData || !isIncludeDate) {
+                //  기간 이외 날짜 이거나 / 일정요일에 선택이 안된 경우
+                return (
+                  <DatesContainer key={index} height={window_height}>
+                    <DisableDateCircle>
+                      <DateNumber
+                        color={'#CACCD6'}
+                        isToday={false}
+                        notIncludeThisMonth={true}
+                        holiday={index === 0}
+                        isSaturday={index === 6}
+                      >
+                        {days.format('D')}
+                      </DateNumber>
+                    </DisableDateCircle>
                   </DatesContainer>
                 );
               } else {

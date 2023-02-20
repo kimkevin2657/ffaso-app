@@ -176,7 +176,7 @@ export const createTeacherSchedule =
     try {
       await api.post('schedules', postData);
       // console.log('data', data);
-      Alert.alert('스케줄이 등록되었습니다.');
+      Alert.alert('일정이 등록되었습니다.');
       dispatch(getTeacherSchedules(postData.date, user?.id));
       dispatch(saveAddSuccess());
       // dispatch(addSchedule(data))

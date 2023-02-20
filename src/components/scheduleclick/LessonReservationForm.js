@@ -374,7 +374,7 @@ const LessonReservationForm = ({ onReservation, coupon, gyms }) => {
                 ? '수강권을 선택해주세요.'
                 : !birthDate
                 ? '날짜를 선택해주세요.'
-                : '이 날 해당하는 스케줄이 없습니다.'
+                : '이 날 해당하는 일정이 없습니다.'
             }
           />
         </View>

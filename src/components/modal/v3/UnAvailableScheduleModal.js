@@ -1,21 +1,12 @@
 import React from 'react';
 
-import {
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  Text,
-} from 'react-native';
+import { Modal, ScrollView, StyleSheet, View } from 'react-native';
 import { SCREEN_HEIGHT } from '../../../constants/constants';
 import {
   BoldLabel14,
   BoldLabel16,
   BoldLabel18,
   NormalBoldLabel14,
-  NormalLabel,
 } from '../../Label';
 import RowContainer from '../../containers/RowContainer';
 import Touchable from '../../buttons/Touchable';
@@ -59,12 +50,7 @@ const UnAvailableScheduleModal = ({
             text={'중복된 일정은 제외됩니다.'}
             style={{ ...styles.redColor, marginBottom: 17, marginTop: 15 }}
           />
-          <Touchable
-            style={styles.button}
-            onPress={() => {
-              onRequestClose();
-            }}
-          >
+          <Touchable style={styles.button} onPress={onRequestClose}>
             <BoldLabel18 text={'확인'} />
           </Touchable>
         </View>
