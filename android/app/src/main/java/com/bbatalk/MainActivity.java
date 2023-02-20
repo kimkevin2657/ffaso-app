@@ -1,4 +1,4 @@
-package com.bbatalk;
+package com.bbtalk;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;

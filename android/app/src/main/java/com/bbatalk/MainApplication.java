@@ -1,4 +1,4 @@
-package com.bbatalk;
+package com.bbtalk;
 
 import android.app.Application;
 import com.facebook.react.PackageList;

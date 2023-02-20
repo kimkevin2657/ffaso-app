@@ -163,8 +163,8 @@ export function PayplePaymentScreen({ navigation, route }) {
         baseURL += "&PCD_PAYER_HP=" + user?.phoneNumber;
         baseURL += "&PCD_PAYER_EMAIL=" + user?.email;
         baseURL += "&PCD_PAY_GOODS=" + gym?.name + " " + selectNoblesss.name;
-        // baseURL += "&PCD_PAY_TOTAL=" + totalPrice;
-        baseURL += "&PCD_PAY_TOTAL=" + String(100);
+        baseURL += "&PCD_PAY_TOTAL=" + totalPrice;
+        // baseURL += "&PCD_PAY_TOTAL=" + String(100);
         baseURL += "&PCD_PAY_ISTAX=" + "N";
         baseURL += "&PCD_AUTH_KEY=" + authdata.data.AuthKey;
         baseURL += "&PCD_PAY_URL=" + authdata.data.return_url.split("=")[2];

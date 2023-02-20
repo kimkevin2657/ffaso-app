@@ -93,9 +93,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.bbatalk"
+    namespace "com.bbtalk"
     defaultConfig {
-        applicationId "com.bbatalk"
+        applicationId "com.bbtalk"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 5
@@ -113,22 +113,26 @@ android {
     }
     signingConfigs {
         debug {
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
+            // storeFile file('debug.keystore')
+            // storePassword 'android'
+            // keyAlias 'androiddebugkey'
+            // keyPassword 'android'
+            storeFile file(MYAPP_RELEASE_STORE_FILE)
+            storePassword MYAPP_RELEASE_STORE_PASSWORD
+            keyAlias MYAPP_RELEASE_KEY_ALIAS
+            keyPassword MYAPP_RELEASE_KEY_PASSWORD
         }
         release {
-            storeFile file('authdk')
-            storePassword 'authdk'
-            keyAlias 'authdk'
-            keyPassword 'authdk'
-            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
+            // storeFile file('authdk')
+            // storePassword 'authdk'
+            // keyAlias 'authdk'
+            // keyPassword 'authdk'
+            // if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
                 storeFile file(MYAPP_RELEASE_STORE_FILE)
                 storePassword MYAPP_RELEASE_STORE_PASSWORD
                 keyAlias MYAPP_RELEASE_KEY_ALIAS
                 keyPassword MYAPP_RELEASE_KEY_PASSWORD
-            }
+            // }
 
         }
     }
