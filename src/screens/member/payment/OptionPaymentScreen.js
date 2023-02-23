@@ -30,6 +30,7 @@ import { authenticate } from './payple';
 const OptionPaymentScreen = ({ navigation, route }) => {
   const { token } = useSelector((state) => state.auth);
   const { gym } = route.params;
+  const [oid, setOID] = useState('');
 
   const [selectedOption, setSelectedOption] = useState(null);
   const [selectedOptionMonth, setSelectedOptionMonth] = useState(0);
@@ -133,9 +134,9 @@ const OptionPaymentScreen = ({ navigation, route }) => {
             Alert.alert('현금영수증이 필요하신가요?', '', [
               {
                 text: '아니오',
-                onPress: () => onPayment('현금', false),
+                onPress: () => onPayment('현금', false, ''),
               },
-              { text: '예', onPress: () => onPayment('현금', true) },
+              { text: '예', onPress: () => onPayment('현금', true, '') },
             ]);
           } else if (paymentMethod === 'card') {
             console.log(" !!!==========  membership card payment    ", totalPrice);

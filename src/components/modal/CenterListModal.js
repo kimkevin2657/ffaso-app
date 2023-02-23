@@ -26,6 +26,7 @@ const CenterListModal = ({
   disableMsg,
   selectStyle,
 }) => {
+
   return (
     <>
       <TouchableOpacity

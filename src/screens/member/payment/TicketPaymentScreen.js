@@ -30,6 +30,7 @@ import { authenticate } from './payple';
 const TicketPaymentScreen = ({ navigation, route }) => {
   const { user, token } = useSelector((state) => state.auth);
   const { gym } = route.params;
+  const [oid, setOID] = useState('');
 
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [selectedTicketMonth, setSelectedTicketMonth] = useState(0);
@@ -52,6 +53,11 @@ const TicketPaymentScreen = ({ navigation, route }) => {
     teacher: false,
     date: false,
   });
+  const [isCash, setisCash] = useState(false);
+  const [isCard, setisCard] = useState(false);
+  const [isMaintenance, setisMaintenance] = useState(false);
+  const [allmemberships, setallmemberships] = useState([]);
+
   const [selectedProductDetailId, setSelectedProductDetailId] = useState(null);
 
   useEffect(() => {
@@ -140,9 +146,17 @@ const TicketPaymentScreen = ({ navigation, route }) => {
         Alert.alert('현금영수증이 필요하신가요?', '', [
           {
             text: '아니오',
-            onPress: () => onPayment('현금', false),
+            onPress: () => onPayment('현금', false, ''),
           },
-          { text: '예', onPress: () => onPayment('현금', true) },
+          { text: '예', onPress: () => onPayment('현금', true, '') },
+        ]);
+      } else if (paymentMethod === "maintenance"){
+        Alert.alert('관리비로 청구가 됩니다.', '', [
+          {
+            text: '아니오',
+            onPress: () => onPayment('관리비', false, ''),
+          },
+          { text: '예', onPress: () => onPayment('관리비', false, '') },
         ]);
       } else if (paymentMethod === 'card') {
         authenticate().then((authdata) => {
@@ -200,6 +214,7 @@ const TicketPaymentScreen = ({ navigation, route }) => {
     try {
       const { data } = await api.get(`products?gymId=${gym.id}`);
       setProducts(data);
+      setallmemberships(data?.lessonTickets);
     } catch (e) {
       console.log(e);
       console.log(e.response);
@@ -242,6 +257,19 @@ const TicketPaymentScreen = ({ navigation, route }) => {
     }
   }, []);
 
+  const setpaymentmethods = (selectedval) => {
+    console.log("!!!!====== selectedval.name    ", selectedval.name);
+      for (let i = 0; i < allmemberships.length; i++){
+          if (selectedval?.name === allmemberships[i].name){
+            setisCash(allmemberships[i].iscash);
+            setisCard(allmemberships[i].iscard);
+            setisMaintenance(allmemberships[i].ismaintenance);
+            // setisMaintenance(true);
+          }
+        }
+        // console.log("!!!!!!========= iscash, iscard, ismaintenance    ", isCash, isCard, isMaintenance)
+  }
+
   return (
     <Container style={styles.container}>
       <View>
@@ -280,6 +308,7 @@ const TicketPaymentScreen = ({ navigation, route }) => {
                   getProductDiscounts(obj.id);
                   setSelectedTicketMonth(0);
                   setTotalPrice(0);
+                  setpaymentmethods(obj);
                   // onChangeTotalPrice(obj, selectedTicketMonth);
                 }}
               />
@@ -390,19 +419,33 @@ const TicketPaymentScreen = ({ navigation, route }) => {
 
         <NormalBoldLabel text={'결제 유형 선택'} style={{ marginLeft: 24 }} />
         <RowContainer style={styles.paymentRowContainer}>
+        {isCash === true ?
           <PaymentMethodBtn
             text={'현금'}
             isActive={paymentMethod === '현금'}
             icon={'현금'}
             onPress={() => setPaymentMethod('현금')}
-            style={{ marginRight: 16 }}
+            style={{ marginRight: 10 }}
           />
+          : null}
+          {isCard === true ?
           <PaymentMethodBtn
             text={'카드'}
             isActive={paymentMethod === 'card'}
             icon={'카드'}
             onPress={() => setPaymentMethod('card')}
+            style={{ marginRight: 10 }}
           />
+          : null}
+          {isMaintenance === true ?
+          <PaymentMethodBtn
+            text={'관리비 부과'}
+            isActive={paymentMethod === 'maintenance'}
+            icon={'현금'}
+            onPress={() => setPaymentMethod('maintenance')}
+            style={{ marginRight: 10 }}
+          />
+          : null}
         </RowContainer>
 
         <SubTitleInfo

@@ -34,6 +34,7 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
   const [selectMonth, setSelectMonth] = useState(0); // 회원권 횟수
   const [birthDate, setBirthDate] = useState(new Date());
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [oid, setOID] = useState('');
   const [termInfoOpen, setTermInfoOpen] = useState({
     PRODUCT: false,
     DEAL: false,
@@ -48,6 +49,11 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
     product: false,
     date: false,
   });
+  const [isCash, setisCash] = useState(false);
+  const [isCard, setisCard] = useState(false);
+  const [isMaintenance, setisMaintenance] = useState(false);
+  const [allmemberships, setallmemberships] = useState([]);
+
   const [selectedProductDetailId, setSelectedProductDetailId] = useState(null);
 
   useEffect(() => {
@@ -134,10 +140,19 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
           Alert.alert('현금영수증이 필요하신가요?', '', [
             {
               text: '아니오',
-              onPress: () => onPayment('현금', false),
+              onPress: () => onPayment('현금', false, ''),
             },
-            { text: '예', onPress: () => onPayment('현금', true) },
+            { text: '예', onPress: () => onPayment('현금', true, '') },
           ]);
+        } else if (paymentMethod === "maintenance"){
+          Alert.alert('관리비로 청구가 됩니다.', '', [
+            {
+              text: '아니오',
+              onPress: () => onPayment('관리비', false, ''),
+            },
+            { text: '예', onPress: () => onPayment('관리비', false, '') },
+          ]);
+
         } else if (paymentMethod === 'card') {
           console.log(" !!!==========  membership card payment    ", totalPrice, "   ", selectMonth);
             authenticate().then((authdata) => {
@@ -198,7 +213,9 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
   const getProducts = async () => {
     try {
       const { data } = await api.get(`products?gymId=${gym?.id}`);
+      // console.log("!!!!!======== products     ", data?.memberships);
       setProducts(data);
+      setallmemberships(data?.memberships);
     } catch (e) {
       console.log(e);
       console.log(e.response);
@@ -216,6 +233,21 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
       console.log('e.res', e.response);
     }
   }, []);
+
+  const setpaymentmethods = (selectedval) => {
+    // console.log("!!!!====== selectedval.name    ", selectedval?.name);
+      for (let i = 0; i < allmemberships.length; i++){
+          if (selectedval?.name === allmemberships[i].name){
+            // console.log("!!!======  hit   at ", i , "   ", allmemberships[i]);
+            setisCash(allmemberships[i].iscash);
+            setisCard(allmemberships[i].iscard);
+            setisMaintenance(allmemberships[i].ismaintenance);
+            // setisMaintenance(true);
+          }
+        }
+        // console.log("!!!!!!========= iscash, iscard, ismaintenance    ", isCash, isCard, isMaintenance)
+  }
+
 
   return (
     <Container style={styles.container}>
@@ -255,6 +287,7 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
                   getProductDiscounts(obj.id);
                   setSelectMonth(0);
                   setTotalPrice(0);
+                  setpaymentmethods(obj);
                   // onChangeTotalPrice(obj, selectMonth);
                 }}
               />
@@ -332,19 +365,34 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
 
         <NormalBoldLabel text={'결제 유형 선택'} style={{ marginLeft: 24 }} />
         <RowContainer style={styles.paymentRowContainer}>
+          {isCash === true ?
           <PaymentMethodBtn
             text={'현금'}
             isActive={paymentMethod === '현금'}
             icon={'현금'}
             onPress={() => setPaymentMethod('현금')}
-            style={{ marginRight: 16 }}
+            style={{ marginRight: 10 }}
           />
+          : null}
+          {isCard === true ?
           <PaymentMethodBtn
             text={'카드'}
             isActive={paymentMethod === 'card'}
             icon={'카드'}
             onPress={() => setPaymentMethod('card')}
+            style={{ marginRight: 10 }}
           />
+          : null}
+          {isMaintenance === true ?
+          <PaymentMethodBtn
+            text={'관리비 부과'}
+            isActive={paymentMethod === 'maintenance'}
+            icon={'현금'}
+            onPress={() => setPaymentMethod('maintenance')}
+            style={{ marginRight: 10 }}
+          />
+          : null}
+
         </RowContainer>
 
         <SubTitleInfo
