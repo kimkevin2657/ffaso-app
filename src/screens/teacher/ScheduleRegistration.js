@@ -192,6 +192,11 @@ const ScheduleRegistration = ({ navigation }) => {
   };
 
   const onClickCreateSchedule = async () => {
+    console.log("!!!!======= onClickCreateSchedule clicked       ");
+    console.log("!!!!======= onClickCreateSchedule clicked      startdate ", startDate);
+    console.log("!!!!======= onClickCreateSchedule clicked       ", endDate);
+    console.log("!!!!======= onClickCreateSchedule clicked       ", schedules);
+    console.log("!!!!======= onClickCreateSchedule clicked       ", selectDate);
     if (startDate > endDate) {
       Alert.alert('종료일을 시작일 이후로 입력해주세요');
     } else if (schedules.length <= 0) {
@@ -207,16 +212,17 @@ const ScheduleRegistration = ({ navigation }) => {
         days: selectDate,
         schedules,
       };
-
+      console.log("!!!!======= onClickCreateSchedule clicked   body   ", body);
       try {
-        const { data } = await apiv3.post('teacher-current-schedules', params);
+        const { data } = await apiv3.post('teacher-current-schedules', body);
         navigation.navigate('ScheduleRegistrationSelect', {
           responseDates: data,
           body,
         });
       } catch (e) {
         if (e?.response?.data?.msg) {
-          alert(e.response.data.msg);
+          console.log("!!!!=========== error msg   ", e.response.data.msg);
+          alert("!!!=======  error msg   ", e.response.data.msg);
         }
       }
     }

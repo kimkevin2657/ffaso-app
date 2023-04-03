@@ -93,6 +93,7 @@ const CenterReviewWriting = ({ navigation, route }) => {
     }
     try {
       let body = new FormData();
+      body.append('id', auth.user.id);
       body.append('gym', gym.id);
       body.append('score', selectScore);
       body.append('category', checked);
@@ -100,10 +101,13 @@ const CenterReviewWriting = ({ navigation, route }) => {
       if (image) {
         body.append('image', image);
       }
-
-      let { data } = await api.post('gym-reviews/', body, {
-        headers: { Authorization: `Token ${token}` },
-      });
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Token ${token}`,
+        },
+      };
+      let { data } = await api.post('gym-reviews/', body, config);
       dispatch(getGyms(null, null));
       resetNavigation(navigation, 'MemberMain');
       navigation.navigate('Review', { gym });

@@ -142,58 +142,64 @@ const TicketPaymentScreen = ({ navigation, route }) => {
     } else if (!selectedTeacher) {
       Alert.alert('강사를 선택해주세요.');
     } else {
-      if (paymentMethod === '현금') {
-        Alert.alert('현금영수증이 필요하신가요?', '', [
-          {
-            text: '아니오',
-            onPress: () => onPayment('현금', false, ''),
-          },
-          { text: '예', onPress: () => onPayment('현금', true, '') },
-        ]);
-      } else if (paymentMethod === "maintenance"){
-        Alert.alert('관리비로 청구가 됩니다.', '', [
-          {
-            text: '아니오',
-            onPress: () => onPayment('관리비', false, ''),
-          },
-          { text: '예', onPress: () => onPayment('관리비', false, '') },
-        ]);
-      } else if (paymentMethod === 'card') {
-        authenticate().then((authdata) => {
-          console.log("!!!===== membership authdata   ", authdata.data);
-          const selectNoblesss = selectedTicket;
-          navigation.navigate('PayplePaymentScreen', {
-              paymentMethod,
-              totalPrice,
-              authdata,
-              gym,
-              selectNoblesss,
-              onComplete: (res) => {
-                console.log("!!!!!======== membership Payple onComplete res    ", res);
-                if (res.status == true){
-                  setOID(res.msg);
-                  onPayment('카드', null, res.msg);
-                }else{
-                  Alert.alert("결제에 실패하였습니다. ", res.msg);
-                  navigation.goBack();
+      var checkerdata = await apiv3.post('lesson-exist-checker', {ticketId: selectedTicket?.id, userId: user?.id}, {headers: {Authorization: `Token ${token}`,},});
+      console.log("!!!==== checkerdata   ", checkerdata.data);
+      if (checkerdata.data.result === 0){
+        if (paymentMethod === '현금') {
+          Alert.alert('현금영수증이 필요하신가요?', '', [
+            {
+              text: '아니오',
+              onPress: () => onPayment('현금', false, ''),
+            },
+            { text: '예', onPress: () => onPayment('현금', true, '') },
+          ]);
+        } else if (paymentMethod === "maintenance"){
+          Alert.alert('관리비로 청구가 됩니다.', '', [
+            {
+              text: '아니오',
+              onPress: () => onPayment('관리비', false, ''),
+            },
+            { text: '예', onPress: () => onPayment('관리비', false, '') },
+          ]);
+        } else if (paymentMethod === 'card') {
+          authenticate().then((authdata) => {
+            console.log("!!!===== membership authdata   ", authdata.data);
+            const selectNoblesss = selectedTicket;
+            navigation.navigate('PayplePaymentScreen', {
+                paymentMethod,
+                totalPrice,
+                authdata,
+                gym,
+                selectNoblesss,
+                onComplete: (res) => {
+                  console.log("!!!!!======== membership Payple onComplete res    ", res);
+                  if (res.status == true){
+                    setOID(res.msg);
+                    onPayment('카드', null, res.msg);
+                  }else{
+                    Alert.alert("결제에 실패하였습니다. ", res.msg);
+                    navigation.goBack();
+                  }
                 }
-              }
+            })
+          }).catch((err) => {
+            console.log(" !!!====== membership authdata error     ", err);
           })
-        }).catch((err) => {
-          console.log(" !!!====== membership authdata error     ", err);
-        })
-        // navigation.navigate('IamPortPayment', {
-        //   paymentMethod,
-        //   onComplete: (res) => {
-        //     const { success, imp_uid, merchant_uid, error_msg } = res;
-        //     if (success) {
-        //       onCheckIamPortPayment(imp_uid);
-        //       // onPayment('카드');
-        //     } else {
-        //       Alert.alert('결제에 실패하였습니다.', error_msg);
-        //     }
-        //   },
-        // });
+          // navigation.navigate('IamPortPayment', {
+          //   paymentMethod,
+          //   onComplete: (res) => {
+          //     const { success, imp_uid, merchant_uid, error_msg } = res;
+          //     if (success) {
+          //       onCheckIamPortPayment(imp_uid);
+          //       // onPayment('카드');
+          //     } else {
+          //       Alert.alert('결제에 실패하였습니다.', error_msg);
+          //     }
+          //   },
+          // });
+        }
+      }else{
+        Alert.alert("이미 수강권이 존재합니다");
       }
     }
   };
