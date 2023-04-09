@@ -220,10 +220,10 @@ const TicketPaymentScreen = ({ navigation, route }) => {
       if(selectedProduct.discountPrice%10000 !=0) priceDetailDiscount + selectedProduct.discountPrice%10000;
       const listPrice=totalPrice + selectedProduct.discountPrice + totalPrice * selectedProduct.discountRate;
       if(selectedProduct.discountPrice){
-        priceDetail= commaNum(listPrice) + '원 ( '+ priceDetailDiscount +'원 할인 '+priceDetail+')';
+        priceDetail= commaNum(listPrice) + '원 \n( '+ priceDetailDiscount +'원 할인 '+priceDetail+' )';
       }
       else if(selectedProduct.discountRate){
-        priceDetail= commaNum(listPrice) + '원 ( '+selectedProduct.discountPrice +'% 할인 '+priceDetail+')';
+        priceDetail= commaNum(listPrice) + '원 \n( '+selectedProduct.discountPrice +'% 할인 '+priceDetail+' )';
       }
       setPriceDetail(priceDetail);
 
@@ -423,7 +423,7 @@ const TicketPaymentScreen = ({ navigation, route }) => {
           </View>
         </View>
 
-        <View style={styles.centerContianer}>
+        <View style={[styles.centerContianer,{marginLeft:0}]}>
           <Text
             style={{
               textAlign: 'right',
@@ -432,7 +432,7 @@ const TicketPaymentScreen = ({ navigation, route }) => {
               color: '#8082FF',
               fontWeight: 'bold',
               marginTop: 21,
-              marginBottom: 37,
+              marginBottom: 37
             }}
           >{`합계 금액 : ${priceDetail}`}</Text>
         </View>
