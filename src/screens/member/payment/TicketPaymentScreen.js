@@ -48,6 +48,7 @@ const TicketPaymentScreen = ({ navigation, route }) => {
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [productDiscounts, setProductDiscounts] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [priceDetail, setPriceDetail] = useState(0);
   const [modalOpen, setModalOpen] = useState({
     product: false,
     teacher: false,
@@ -213,6 +214,19 @@ const TicketPaymentScreen = ({ navigation, route }) => {
           ? selectedPrice * selectMonth
           : selectedProduct?.totalPrice;
       setTotalPrice(totalPrice);
+
+      let priceDetail = commaNum(totalPrice) + '원';
+      let priceDetailDiscount=selectedProduct.discountPrice/10000 + '만';
+      if(selectedProduct.discountPrice%10000 !=0) priceDetailDiscount + selectedProduct.discountPrice%10000;
+      const listPrice=totalPrice + selectedProduct.discountPrice + totalPrice * selectedProduct.discountRate;
+      if(selectedProduct.discountPrice){
+        priceDetail= commaNum(listPrice) + '원 ( '+ priceDetailDiscount +'원 할인 '+priceDetail+')';
+      }
+      else if(selectedProduct.discountRate){
+        priceDetail= commaNum(listPrice) + '원 ( '+selectedProduct.discountPrice +'% 할인 '+priceDetail+')';
+      }
+      setPriceDetail(priceDetail);
+
     }
   };
 
@@ -420,7 +434,7 @@ const TicketPaymentScreen = ({ navigation, route }) => {
               marginTop: 21,
               marginBottom: 37,
             }}
-          >{`합계 금액 : ${commaNum(totalPrice)}원`}</Text>
+          >{`합계 금액 : ${priceDetail}`}</Text>
         </View>
 
         <NormalBoldLabel text={'결제 유형 선택'} style={{ marginLeft: 24 }} />
