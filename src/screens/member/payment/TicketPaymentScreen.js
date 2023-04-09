@@ -216,8 +216,9 @@ const TicketPaymentScreen = ({ navigation, route }) => {
       setTotalPrice(totalPrice);
 
       let priceDetail = commaNum(totalPrice) + '원';
-      let priceDetailDiscount=selectedProduct.discountPrice/10000 + '만';
-      if(selectedProduct.discountPrice%10000 !=0) priceDetailDiscount + selectedProduct.discountPrice%10000;
+      let priceDetailDiscount='';
+      if(selectedProduct.discountPrice%10000 !=0) priceDetailDiscount= selectedProduct.discountPrice%10000 + priceDetailDiscount;
+      if(selectedProduct.discountPrice>=10000) priceDetailDiscount= selectedProduct.discountPrice/10000+'만' + priceDetailDiscount;
       const listPrice=totalPrice + selectedProduct.discountPrice + totalPrice * selectedProduct.discountRate;
       if(selectedProduct.discountPrice){
         priceDetail= commaNum(listPrice) + '원 \n( '+ priceDetailDiscount +'원 할인 '+priceDetail+' )';
