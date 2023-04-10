@@ -292,6 +292,7 @@ const OptionPaymentScreen = ({ navigation, route }) => {
               <BirthPicker
                 isOpen={isOptionDatePickerOpen}
                 date={optionDate}
+                minimumDate={new Date()}
                 onConfirm={(selectedDate) => {
                   setIsOptionDatePickerOpen(false);
                   setOptionDate(selectedDate);

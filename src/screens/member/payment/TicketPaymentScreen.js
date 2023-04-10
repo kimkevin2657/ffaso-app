@@ -398,6 +398,7 @@ const TicketPaymentScreen = ({ navigation, route }) => {
               <BirthPicker
                 isOpen={isTicketDatePickerOpen}
                 date={ticketDate}
+                minimumDate={new Date()}
                 onConfirm={(selectedDate) => {
                   setIsTicketDatePickerOpen(false);
                   setTicketDate(selectedDate);

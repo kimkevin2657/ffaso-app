@@ -325,6 +325,7 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
             <BirthPicker
               isOpen={isDatePickerOpen}
               date={birthDate}
+              minimumDate={new Date()}
               onConfirm={(selectedDate) => {
                 setIsDatePickerOpen(false);
                 setBirthDate(selectedDate);
