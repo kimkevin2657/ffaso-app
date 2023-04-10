@@ -215,16 +215,21 @@ const TicketPaymentScreen = ({ navigation, route }) => {
           : selectedProduct?.totalPrice;
       setTotalPrice(totalPrice);
 
+      console.log(selectedProduct);
+
       let priceDetail = commaNum(totalPrice) + '원';
       let priceDetailDiscount='';
       if(selectedProduct.discountPrice%10000 !=0) priceDetailDiscount= selectedProduct.discountPrice%10000 + priceDetailDiscount;
       if(selectedProduct.discountPrice>=10000) priceDetailDiscount= selectedProduct.discountPrice/10000+'만' + priceDetailDiscount;
-      const listPrice=totalPrice + selectedProduct.discountPrice + totalPrice * selectedProduct.discountRate;
-      if(selectedProduct.discountPrice){
+
+      let listPrice=totalPrice;
+      if(selectedProduct.type=="금액" && selectedProduct.discountPrice ){
+        listPrice=listPrice + selectedProduct.discountPrice;
         priceDetail= commaNum(listPrice) + '원 \n( '+ priceDetailDiscount +'원 할인 '+priceDetail+' )';
       }
-      else if(selectedProduct.discountRate){
-        priceDetail= commaNum(listPrice) + '원 \n( '+selectedProduct.discountPrice +'% 할인 '+priceDetail+' )';
+      else if(selectedProduct.type=="퍼센트" && selectedProduct.discountRate){
+        listPrice=listPrice / (1 - (selectedProduct.discountRate/100));
+        priceDetail= commaNum(listPrice) + '원 \n( '+selectedProduct.discountRate +'% 할인 '+priceDetail+' )';
       }
       setPriceDetail(priceDetail);
 
