@@ -334,6 +334,8 @@ const TicketPaymentScreen = ({ navigation, route }) => {
                   getProductDiscounts(obj.id);
                   setSelectedTicketMonth(0);
                   setTotalPrice(0);
+                  setPriceDetail('0');
+                  setSelectedTeacher(null);
                   setpaymentmethods(obj);
                   // onChangeTotalPrice(obj, selectedTicketMonth);
                 }}
