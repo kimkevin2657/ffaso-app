@@ -45,6 +45,7 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
   const [products, setProducts] = useState({});
   const [productDiscounts, setProductDiscounts] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [priceDetail, setPriceDetail] = useState(0);
   const [modalOpen, setModalOpen] = useState({
     product: false,
     date: false,
@@ -207,6 +208,22 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
           ? selectedPrice * selectMonth
           : selectedProduct?.totalPrice;
       setTotalPrice(totalPrice);
+
+      let priceDetail = commaNum(totalPrice) + '원';
+      let priceDetailDiscount='';
+      if(selectedProduct.discountPrice%10000 !=0) priceDetailDiscount= selectedProduct.discountPrice%10000 + priceDetailDiscount;
+      if(selectedProduct.discountPrice>=10000) priceDetailDiscount= selectedProduct.discountPrice/10000+'만' + priceDetailDiscount;
+
+      let listPrice=totalPrice;
+      if(selectedProduct.type=="금액" && selectedProduct.discountPrice ){
+        listPrice=listPrice + selectedProduct.discountPrice;
+        priceDetail= commaNum(listPrice) + '원 \n( '+ priceDetailDiscount +'원 할인 '+priceDetail+' )';
+      }
+      else if(selectedProduct.type=="퍼센트" && selectedProduct.discountRate){
+        listPrice=listPrice / (1 - (selectedProduct.discountRate/100));
+        priceDetail= commaNum(listPrice) + '원 \n( '+selectedProduct.discountRate +'% 할인 '+priceDetail+' )';
+      }
+      setPriceDetail(priceDetail);
     }
   };
 
@@ -287,6 +304,7 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
                   getProductDiscounts(obj.id);
                   setSelectMonth(0);
                   setTotalPrice(0);
+                  setPriceDetail('0');
                   setpaymentmethods(obj);
                   // onChangeTotalPrice(obj, selectMonth);
                 }}
@@ -361,7 +379,7 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
               marginTop: 21,
               marginBottom: 37,
             }}
-          >{`합계 금액 : ${commaNum(totalPrice)}원`}</Text>
+          >{`합계 금액 : ${priceDetail}`}</Text>
         </View>
 
         <NormalBoldLabel text={'결제 유형 선택'} style={{ marginLeft: 24 }} />

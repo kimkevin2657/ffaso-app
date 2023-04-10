@@ -215,8 +215,6 @@ const TicketPaymentScreen = ({ navigation, route }) => {
           : selectedProduct?.totalPrice;
       setTotalPrice(totalPrice);
 
-      console.log(selectedProduct);
-
       let priceDetail = commaNum(totalPrice) + '원';
       let priceDetailDiscount='';
       if(selectedProduct.discountPrice%10000 !=0) priceDetailDiscount= selectedProduct.discountPrice%10000 + priceDetailDiscount;
