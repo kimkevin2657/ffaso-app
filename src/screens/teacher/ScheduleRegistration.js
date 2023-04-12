@@ -120,6 +120,52 @@ const ScheduleRegistration = ({ navigation }) => {
     }
   };
 
+
+  const formCheck = () => {
+    let formCheckBool = true;
+    if (
+      ( selectDate.includes("토") || selectDate.includes("일") )
+      &&
+      !(
+        parseInt(teacherGyms[0].weekendStartTime.substring(0,2)) <= parseInt(new Date(selectedStartTime).toLocaleTimeString().substring(0,2))
+        &&
+        parseInt(new Date(selectedStartTime).toLocaleTimeString().substring(0,2)) <= parseInt(teacherGyms[0].weekendEndTime.substring(0,2))
+      )
+      &&
+      selectedStartTime
+    ){
+      Alert.alert(
+        `[${selectTicket?.name} 수강 ${selectCenter.weekendStartTime.slice(
+          0,
+          5
+        )} ~ ${selectCenter.weekendEndTime.slice(0, 5)}]`,
+        `센터 운영 시간 이외에 일정을 추가할 수 없습니다.`
+      );
+      formCheckBool = false;
+    }
+    if (
+      (!selectDate.includes("토") && !selectDate.includes("일") && selectDate.length > 0)
+      &&
+      !(
+        parseInt(teacherGyms[0].weekdayStartTime.substring(0,2)) <= parseInt(new Date(selectedStartTime).toLocaleTimeString().substring(0,2))
+        &&
+        parseInt(new Date(selectedStartTime).toLocaleTimeString().substring(0,2)) <= parseInt(teacherGyms[0].weekdayEndTime.substring(0,2))
+      )
+      &&
+      selectedStartTime
+    ){
+      Alert.alert(
+        `[${selectTicket?.name} 수강 ${selectCenter.weekdayStartTime.slice(
+          0,
+          5
+        )} ~ ${selectCenter.weekdayEndTime.slice(0, 5)}]`,
+        `센터 운영 시간 이외에 일정을 추가할 수 없습니다.`
+      );
+      formCheckBool = false;
+    }
+    return formCheckBool;
+  }
+
   const addScheduleList = () => {
     if (isSelectGym) {
       Alert.alert('센터를 선택해주세요');
@@ -192,6 +238,9 @@ const ScheduleRegistration = ({ navigation }) => {
   };
 
   const onClickCreateSchedule = async () => {
+    if (!formCheck()){
+      return;
+    }
     console.log("!!!!======= onClickCreateSchedule clicked       ");
     console.log("!!!!======= onClickCreateSchedule clicked      startdate ", startDate);
     console.log("!!!!======= onClickCreateSchedule clicked       ", endDate);
