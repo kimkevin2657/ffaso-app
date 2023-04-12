@@ -50,7 +50,7 @@ const LessonReservationFormV3 = ({
   );
   const [selectDate, setSelectDate] = useState([]); //요일선택(월화수목금)
   const [isStartTimePickerOpen, setIsStartTimePickerOpen] = useState(false); //가능한 시간대 선택
-  const [selectedStartTime, setSelectedStartTime] = useState(); //가능한 시간대 값
+  const [selectedStartTime, setSelectedStartTime] = useState(null); //가능한 시간대 값
 
   const [modalOpen, setModalOpen] = useState({
     gym: false,
@@ -427,9 +427,10 @@ const LessonReservationFormV3 = ({
           text={'가능한 시간대 선택'}
         />
         <TimeSelect
+          placeholder={'시작 시간'}
           isPickerOpen={isStartTimePickerOpen}
           time={selectedStartTime}
-          onPress={(selectedStartTime, selectedTime) => {
+          onPress={() => {
             setSelectedStartTime(new Date(Date.parse("1991-01-01T09:00:00.417-15:00")));
             setIsStartTimePickerOpen(true)
           }}
