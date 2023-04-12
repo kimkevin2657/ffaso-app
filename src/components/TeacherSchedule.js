@@ -33,7 +33,6 @@ const TeacherSchedule = ({
   setSelectedContent,
   onPress,
 }) => {
-  let totalCount=item.userCounts.attend + item.userCounts.absent + item.userCounts.cancel;
   const statusType = [
     {
       title: '취소',
@@ -81,7 +80,7 @@ const TeacherSchedule = ({
                 style={{ marginRight: 22 }}
               />
               <BoldLabel12
-                text={`정원 : ${totalCount ?? 0}명`}
+                text={`정원 : ${item?.userCounts?.total ?? 0}명`}
                 style={{ color: '#555' }}
               />
               {/*<NormalBoldLabel12*/}
