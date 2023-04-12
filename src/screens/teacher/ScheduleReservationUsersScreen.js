@@ -195,7 +195,6 @@ const ScheduleReservationUsersScreen = ({ navigation, route }) => {
     }
   };
 
-  let totalCount=selectedSchedule.userCounts.attend + selectedSchedule.userCounts.absent + selectedSchedule.userCounts.cancel;
   return (
     <View style={styles.container}>
       <FlatList
@@ -230,7 +229,7 @@ const ScheduleReservationUsersScreen = ({ navigation, route }) => {
                 style={{ color: '#000' }}
               />
               <BoldLabel12
-                text={`정원 : ${totalCount ?? 0}명`}
+                text={`정원 : ${selectedSchedule?.userCounts?.total ?? 0}명`}
                 style={{ color: '#555', marginLeft: 8, marginRight: 26 }}
               />
               <NormalLabel12
