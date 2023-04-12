@@ -177,7 +177,10 @@ const OptionPaymentScreen = ({ navigation, route }) => {
             // });
           }
 
-        } else{
+        }
+        else if (checkerdata.data.result === 2){
+          Alert.alert("이미 결제 대기중인 옵션권이 존재합니다. 관리자에게 문의하세요");
+        }else{
           Alert.alert("이미 옵션권이 존재합니다");
         }
     }
