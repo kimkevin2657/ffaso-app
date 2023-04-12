@@ -406,6 +406,8 @@ const ScheduleRegistration = ({ navigation }) => {
           isPickerOpen={isStartTimePickerOpen}
           time={selectedStartTime}
           onPress={() => {
+            setSelectedStartTime(new Date(Date.parse("1991-01-01T09:00:00.417-15:00")));
+            setIsStartTimePickerOpen(true)
             if (isSelectGym) {
               alert('센터를 선택해주세요');
               return;
