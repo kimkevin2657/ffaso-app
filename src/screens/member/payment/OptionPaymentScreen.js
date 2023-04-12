@@ -28,7 +28,7 @@ import CenterListModal from '../../../components/modal/CenterListModal';
 import { authenticate } from './payple';
 
 const OptionPaymentScreen = ({ navigation, route }) => {
-  const { token } = useSelector((state) => state.auth);
+  const { user, token } = useSelector((state) => state.auth);
   const { gym } = route.params;
   const [oid, setOID] = useState('');
 
@@ -91,6 +91,7 @@ const OptionPaymentScreen = ({ navigation, route }) => {
         type: paymentMethod, // 추후에 변경예상
         price,
         period: Number(selectedOptionMonth),
+        userId: user?.id,
         oid: oid
       };
       if (selectedProductDetailId) {
@@ -129,7 +130,6 @@ const OptionPaymentScreen = ({ navigation, route }) => {
       var checkerdata = await apiv3.post('option-exist-checker', {optionId: selectedOption?.id, userId: user?.id}, {headers: {Authorization: `Token ${token}`,},});
       console.log(" !!!!!=======  checkerdata    ", checkerdata.data);
       if (checkerdata.data.result == 0){
-
           if (paymentMethod === '현금') {
             Alert.alert('현금영수증이 필요하신가요?', '', [
               {
