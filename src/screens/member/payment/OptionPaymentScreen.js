@@ -126,7 +126,7 @@ const OptionPaymentScreen = ({ navigation, route }) => {
     } else if (selectedOptionMonth === 0) {
       Alert.alert('등록 개월을 선택해주세요.');
     } else {
-      // console.log(" !!!!====== userId    ", user?.id, "     ", selectedOption?.id);
+      console.log(" !!!!====== userId    ", user?.id, "     ", selectedOption?.id);
       var checkerdata = await apiv3.post('option-exist-checker', {optionId: selectedOption?.id, userId: user?.id}, {headers: {Authorization: `Token ${token}`,},});
       console.log(" !!!!!=======  checkerdata    ", checkerdata.data);
       if (checkerdata.data.result == 0){
