@@ -72,6 +72,7 @@ export const getGyms =
         }
       );
 
+      dispatch(resetData(data));
       dispatch(saveGyms(data));
     } catch (err) {
       console.log('err', err.response);
