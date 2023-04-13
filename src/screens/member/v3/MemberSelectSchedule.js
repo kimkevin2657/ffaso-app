@@ -127,7 +127,7 @@ const MemberSelectSchedule = ({ navigation, route }) => {
       if (!parsingScheduleList.hasOwnProperty(date) && data?.day) {
         parsingScheduleList[date] = [];
       }
-      if (date) {
+      if (date && new Date(data.date) > new Date()){
         parsingScheduleList[date].push(data);
       }
     });
