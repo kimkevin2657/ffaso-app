@@ -202,7 +202,7 @@ const MemberCenterListScreen = ({ navigation, route }) => {
           setSelectedFilterLabel('');
         }}
         selected={() => {
-          if (checked === '') {
+          if (checked === null) {
             Alert.alert(`${selectedFilterLabel}을 선택해주세요.`);
             return;
           }
