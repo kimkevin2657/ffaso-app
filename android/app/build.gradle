@@ -100,9 +100,8 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 8
         versionName "2.3.0"
+        resValue 'string', "CODE_PUSH_APK_BUILD_TIME", String.format("\"%d\"", System.currentTimeMillis())
     }
-    
-
     splits {
         abi {
             reset()
@@ -139,6 +138,13 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+	        resValue "string", "CodePushDeploymentKey",'""' 
+        }
+        releaseStaging {
+      	    initWith release
+            //codepush token staging
+            resValue "string", "CodePushDeploymentKey","" 
+            matchingFallbacks = ['release']
         }
         release {
             // Caution! In production, you need to generate your own keystore file.
@@ -146,6 +152,8 @@ android {
             signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            //codepush token production
+            resValue "string", "CodePushDeploymentKey", ""
         }
     }
 
@@ -194,3 +202,4 @@ dependencies {
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
+apply from: "../../node_modules/react-native-code-push/android/codepush.gradle"
