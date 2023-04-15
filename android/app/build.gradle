@@ -121,6 +121,12 @@ android {
             keyAlias MYAPP_RELEASE_KEY_ALIAS
             keyPassword MYAPP_RELEASE_KEY_PASSWORD
         }
+        releaseStaging {
+            storeFile file(MYAPP_RELEASE_STORE_FILE)
+            storePassword MYAPP_RELEASE_STORE_PASSWORD
+            keyAlias MYAPP_RELEASE_KEY_ALIAS
+            keyPassword MYAPP_RELEASE_KEY_PASSWORD
+        }
         release {
             // storeFile file('authdk')
             // storePassword 'authdk'
@@ -142,6 +148,7 @@ android {
         }
         releaseStaging {
       	    initWith release
+            signingConfig signingConfigs.debug
             //codepush token staging
             resValue "string", "CodePushDeploymentKey","" 
             matchingFallbacks = ['release']
