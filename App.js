@@ -88,7 +88,6 @@ const codePushOptions = {
     mandatoryContinueButtonLabel: '업데이트'
   },
   //codepush token
-  deploymentKey:"",
   checkFrequency: codePush.CheckFrequency.ON_APP_START,
   installMode: codePush.InstallMode.IMMEDIATE
 }
