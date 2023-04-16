@@ -296,6 +296,9 @@ const TicketPaymentScreen = ({ navigation, route }) => {
         // console.log("!!!!!!========= iscash, iscard, ismaintenance    ", isCash, isCard, isMaintenance)
   }
 
+  const maximumDate = new Date();
+  maximumDate.setDate(maximumDate.getDate() + 365); 
+
   return (
     <Container style={styles.container}>
       <View>
@@ -406,6 +409,7 @@ const TicketPaymentScreen = ({ navigation, route }) => {
                 isOpen={isTicketDatePickerOpen}
                 date={ticketDate}
                 minimumDate={new Date()}
+                maximumDate={maximumDate}
                 onConfirm={(selectedDate) => {
                   setIsTicketDatePickerOpen(false);
                   setTicketDate(selectedDate);

@@ -220,6 +220,9 @@ const OptionPaymentScreen = ({ navigation, route }) => {
     }
   }, []);
 
+  const maximumDate = new Date();
+  maximumDate.setDate(maximumDate.getDate() + 365); 
+
   return (
     <ScrollView style={{ flex: 1, backgroundColor: '#fbfbfb' }}>
       <View>
@@ -296,6 +299,7 @@ const OptionPaymentScreen = ({ navigation, route }) => {
                 isOpen={isOptionDatePickerOpen}
                 date={optionDate}
                 minimumDate={new Date()}
+                maximumDate={maximumDate}
                 onConfirm={(selectedDate) => {
                   setIsOptionDatePickerOpen(false);
                   setOptionDate(selectedDate);
