@@ -190,11 +190,6 @@ const UserProfile = ({
             text={`${koreanName} ${englishName ? `(${englishName})` : ''}`}
           />
           <NoneLabel text={birth} style={{ marginTop: 6 }} />
-          <RowContainer style={styles.profileStationTextRow}>
-            <View style={styles.profileStation}>
-              <NoneLabel text={'휴회 신청'} style={styles.profileStationText} />
-            </View>
-          </RowContainer>
         </ColumnView>
       </RowContainer>
 
@@ -279,20 +274,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     width: 170,
     marginTop: 6,
-  },
-  profileStation: {
-    borderWidth: 1,
-    borderRadius: 20,
-    paddingHorizontal: 5,
-    paddingVertical: 3,
-    borderColor: '#8082FF',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  profileStationText: {
-    fontSize: 10,
-    lineHeight: 15,
-    color: '#8082FF',
   },
   profileImgBox: {
     width: 92,
