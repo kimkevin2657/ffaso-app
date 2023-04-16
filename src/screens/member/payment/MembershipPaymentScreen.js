@@ -269,6 +269,9 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
         // console.log("!!!!!!========= iscash, iscard, ismaintenance    ", isCash, isCard, isMaintenance)
   }
 
+  const maximumDate = new Date();
+  maximumDate.setDate(maximumDate.getDate() + 365); 
+
 
   return (
     <Container style={styles.container}>
@@ -348,6 +351,7 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
               isOpen={isDatePickerOpen}
               date={birthDate}
               minimumDate={new Date()}
+              maximumDate={maximumDate}
               onConfirm={(selectedDate) => {
                 setIsDatePickerOpen(false);
                 setBirthDate(selectedDate);
