@@ -87,7 +87,6 @@ const codePushOptions = {
     mandatoryUpdateMessage:'필수 업데이트를 시작합니다.',
     mandatoryContinueButtonLabel: '업데이트'
   },
-  //codepush token
   checkFrequency: codePush.CheckFrequency.ON_APP_START,
   installMode: codePush.InstallMode.IMMEDIATE
 }
