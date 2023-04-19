@@ -16,11 +16,6 @@ import api from '../../../api/api';
 import apiv3 from "../../../api/apiv3";
 import { commaNum, resetNavigation } from '../../../util';
 import { useSelector } from 'react-redux';
-import {
-  DEAL_INFO,
-  PRODUCT_INFO,
-  SIGN_UP_INFO,
-} from '../../../constants/paymentInfos';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { MONTHS } from '../../../constants/constants';
@@ -42,7 +37,11 @@ const OptionPaymentScreen = ({ navigation, route }) => {
     DEAL: false,
     SIGNUP: false,
   });
-
+  const [gymAgreement, setGymAgreement] = useState({
+    PRODUCT_INFO: "",
+    DEAL_INFO: "",
+    SIGNUP_INFO: "",
+  });
   const [products, setProducts] = useState({});
   const [productDiscounts, setProductDiscounts] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -60,6 +59,10 @@ const OptionPaymentScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     getProducts();
+  }, []);
+
+  useEffect(() => {
+    getGymAgreement();
   }, []);
 
   const onPayment = async (paymentMethod, hasCashReceipts, oid) => {
@@ -207,6 +210,20 @@ const OptionPaymentScreen = ({ navigation, route }) => {
       console.log(e.response);
     }
   };
+
+  const getGymAgreement = async () => {
+    try{
+      const { data }=await apiv3.post('gymagreement',{gymId:gym?.id,query:true});
+      setGymAgreement({
+        PRODUCT_INFO:data.result.product,
+        DEAL_INFO:data.result.transaction,
+        SIGNUP_INFO:data.result.registration
+      })
+    } catch (e) {
+      console.log(e);
+      console.log(e.response);
+    }
+  }
 
   const getProductDiscounts = useCallback(async (productId) => {
     try {
@@ -358,7 +375,7 @@ const OptionPaymentScreen = ({ navigation, route }) => {
         <SubTitleInfo
           title={'상품고시 정보'}
           isOpen={termInfoOpen.PRODUCT}
-          content={PRODUCT_INFO}
+          content={gymAgreement.PRODUCT_INFO}
           onPress={() =>
             setTermInfoOpen((prev) => {
               return { ...prev, PRODUCT: !termInfoOpen.PRODUCT };
@@ -368,7 +385,7 @@ const OptionPaymentScreen = ({ navigation, route }) => {
         <SubTitleInfo
           title={'거래 정보'}
           isOpen={termInfoOpen.DEAL}
-          content={DEAL_INFO}
+          content={gymAgreement.DEAL_INFO}
           onPress={() =>
             setTermInfoOpen((prev) => {
               return { ...prev, DEAL: !termInfoOpen.DEAL };
@@ -378,7 +395,7 @@ const OptionPaymentScreen = ({ navigation, route }) => {
         <SubTitleInfo
           title={'회원 가입 약관'}
           isOpen={termInfoOpen.SIGNUP}
-          content={SIGN_UP_INFO}
+          content={gymAgreement.SIGNUP_INFO}
           onPress={() =>
             setTermInfoOpen((prev) => {
               return { ...prev, SIGNUP: !termInfoOpen.SIGNUP };
