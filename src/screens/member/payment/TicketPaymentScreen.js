@@ -19,11 +19,6 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Container } from '../../../components/containers/Container';
 import { TICKET_COUNTS } from '../../../constants/constants';
-import {
-  DEAL_INFO,
-  PRODUCT_INFO,
-  SIGN_UP_INFO,
-} from '../../../constants/paymentInfos';
 import CenterListModal from '../../../components/modal/CenterListModal';
 import { authenticate } from './payple';
 
@@ -42,7 +37,11 @@ const TicketPaymentScreen = ({ navigation, route }) => {
     DEAL: false,
     SIGNUP: false,
   });
-
+  const [gymAgreement, setGymAgreement] = useState({
+    PRODUCT_INFO: "",
+    DEAL_INFO: "",
+    SIGNUP_INFO: "",
+  });
   const [products, setProducts] = useState({});
   const [trainers, setTrainers] = useState({});
   const [selectedTeacher, setSelectedTeacher] = useState(null);
@@ -70,6 +69,10 @@ const TicketPaymentScreen = ({ navigation, route }) => {
   useEffect(() => {
     getProducts();
     getTeachers();
+  }, []);
+
+  useEffect(() => {
+    getGymAgreement();
   }, []);
 
   const onPayment = async (paymentMethod, hasCashReceipts, oid) => {
@@ -246,6 +249,20 @@ const TicketPaymentScreen = ({ navigation, route }) => {
       console.log(e.response);
     }
   };
+
+  const getGymAgreement = async () => {
+    try{
+      const { data }=await apiv3.post('gymagreement',{gymId:gym?.id,query:true});
+      setGymAgreement({
+        PRODUCT_INFO:data.result.product,
+        DEAL_INFO:data.result.transaction,
+        SIGNUP_INFO:data.result.registration
+      })
+    } catch (e) {
+      console.log(e);
+      console.log(e.response);
+    }
+  }
 
   const getTeachers = async () => {
     try {
@@ -484,7 +501,7 @@ const TicketPaymentScreen = ({ navigation, route }) => {
         <SubTitleInfo
           title={'상품고시 정보'}
           isOpen={termInfoOpen.PRODUCT}
-          content={PRODUCT_INFO}
+          content={gymAgreement.PRODUCT_INFO}
           onPress={() =>
             setTermInfoOpen((prev) => {
               return { ...prev, PRODUCT: !termInfoOpen.PRODUCT };
@@ -494,7 +511,7 @@ const TicketPaymentScreen = ({ navigation, route }) => {
         <SubTitleInfo
           title={'거래 정보'}
           isOpen={termInfoOpen.DEAL}
-          content={DEAL_INFO}
+          content={gymAgreement.DEAL_INFO}
           onPress={() =>
             setTermInfoOpen((prev) => {
               return { ...prev, DEAL: !termInfoOpen.DEAL };
@@ -504,7 +521,7 @@ const TicketPaymentScreen = ({ navigation, route }) => {
         <SubTitleInfo
           title={'회원 가입 약관'}
           isOpen={termInfoOpen.SIGNUP}
-          content={SIGN_UP_INFO}
+          content={gymAgreement.SIGNUP_INFO}
           onPress={() =>
             setTermInfoOpen((prev) => {
               return { ...prev, SIGNUP: !termInfoOpen.SIGNUP };
