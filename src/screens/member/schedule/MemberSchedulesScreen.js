@@ -64,7 +64,11 @@ const MemberSchedulesScreen = ({ navigation }) => {
           }}
           onSelect={(info, index) => {
             const reservationType = index === 0 ? '강습' : '방문';
-            navigation.navigate('ScheduleRegister', { reservationType });
+            if(reservationType=='강습')
+              navigation.navigate('ScheduleRegister', { reservationType });
+            else if(reservationType=='방문')
+              navigation.navigate('ScheduleCoupons', { reservationType });
+
             setIsBottomModalOpen(false);
           }}
         />

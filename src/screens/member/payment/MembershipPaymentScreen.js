@@ -19,11 +19,6 @@ import { Container } from '../../../components/containers/Container';
 import { MONTHS, SCREEN_WIDTH } from '../../../constants/constants';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {
-  DEAL_INFO,
-  PRODUCT_INFO,
-  SIGN_UP_INFO,
-} from '../../../constants/paymentInfos';
 import CenterListModal from '../../../components/modal/CenterListModal';
 import { authenticate } from './payple';
 
@@ -40,11 +35,17 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
     DEAL: false,
     SIGNUP: false,
   });
+  const [gymAgreement, setGymAgreement] = useState({
+    PRODUCT_INFO: "",
+    DEAL_INFO: "",
+    SIGNUP_INFO: "",
+  });
   const [paymentMethod, setPaymentMethod] = useState('현금'); // or 'card'
 
   const [products, setProducts] = useState({});
   const [productDiscounts, setProductDiscounts] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [priceDetail, setPriceDetail] = useState(0);
   const [modalOpen, setModalOpen] = useState({
     product: false,
     date: false,
@@ -64,6 +65,10 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     getProducts();
+  }, []);
+
+  useEffect(() => {
+    getGymAgreement();
   }, []);
 
   const onPayment = async (paymentMethod, hasCashReceipts, oid) => {
@@ -192,7 +197,11 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
           //   },
           // });
         }
-      } else{
+      } 
+      else if (checkerdata.data.result === 2){
+        Alert.alert("이미 결제 대기중인 회원권이 존재합니다. 관리자에게 문의하세요");
+      }
+      else{
         Alert.alert("이미 회원권이 존재합니다");
       }
     }
@@ -207,6 +216,22 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
           ? selectedPrice * selectMonth
           : selectedProduct?.totalPrice;
       setTotalPrice(totalPrice);
+
+      let priceDetail = commaNum(totalPrice) + '원';
+      let priceDetailDiscount='';
+      if(selectedProduct.discountPrice%10000 !=0) priceDetailDiscount= selectedProduct.discountPrice%10000 + priceDetailDiscount;
+      if(selectedProduct.discountPrice>=10000) priceDetailDiscount= selectedProduct.discountPrice/10000+'만' + priceDetailDiscount;
+
+      let listPrice=totalPrice;
+      if(selectedProduct.type=="금액" && selectedProduct.discountPrice ){
+        listPrice=listPrice + selectedProduct.discountPrice;
+        priceDetail= commaNum(listPrice) + '원 \n( '+ priceDetailDiscount +'원 할인 '+priceDetail+' )';
+      }
+      else if(selectedProduct.type=="퍼센트" && selectedProduct.discountRate){
+        listPrice=listPrice / (1 - (selectedProduct.discountRate/100));
+        priceDetail= commaNum(listPrice) + '원 \n( '+selectedProduct.discountRate +'% 할인 '+priceDetail+' )';
+      }
+      setPriceDetail(priceDetail);
     }
   };
 
@@ -221,6 +246,20 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
       console.log(e.response);
     }
   };
+
+  const getGymAgreement = async () => {
+    try{
+      const { data }=await apiv3.post('gymagreement',{gymId:gym?.id,query:true});
+      setGymAgreement({
+        PRODUCT_INFO:data.result.product,
+        DEAL_INFO:data.result.transaction,
+        SIGNUP_INFO:data.result.registration
+      })
+    } catch (e) {
+      console.log(e);
+      console.log(e.response);
+    }
+  }
 
   const getProductDiscounts = useCallback(async (productId) => {
     try {
@@ -248,7 +287,9 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
         // console.log("!!!!!!========= iscash, iscard, ismaintenance    ", isCash, isCard, isMaintenance)
   }
 
-
+  const maximumDate = new Date();
+  maximumDate.setDate(maximumDate.getDate() + 365); 
+  
   return (
     <Container style={styles.container}>
       <View>
@@ -287,6 +328,7 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
                   getProductDiscounts(obj.id);
                   setSelectMonth(0);
                   setTotalPrice(0);
+                  setPriceDetail('0');
                   setpaymentmethods(obj);
                   // onChangeTotalPrice(obj, selectMonth);
                 }}
@@ -325,6 +367,8 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
             <BirthPicker
               isOpen={isDatePickerOpen}
               date={birthDate}
+              minimumDate={new Date()}
+              maximumDate={maximumDate}
               onConfirm={(selectedDate) => {
                 setIsDatePickerOpen(false);
                 setBirthDate(selectedDate);
@@ -360,7 +404,7 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
               marginTop: 21,
               marginBottom: 37,
             }}
-          >{`합계 금액 : ${commaNum(totalPrice)}원`}</Text>
+          >{`합계 금액 : ${priceDetail}`}</Text>
         </View>
 
         <NormalBoldLabel text={'결제 유형 선택'} style={{ marginLeft: 24 }} />
@@ -398,7 +442,7 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
         <SubTitleInfo
           title={'상품고시 정보'}
           isOpen={termInfoOpen.PRODUCT}
-          content={PRODUCT_INFO}
+          content={gymAgreement.PRODUCT_INFO}
           onPress={() =>
             setTermInfoOpen((prev) => {
               return { ...prev, PRODUCT: !termInfoOpen.PRODUCT };
@@ -408,7 +452,7 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
         <SubTitleInfo
           title={'거래 정보'}
           isOpen={termInfoOpen.DEAL}
-          content={DEAL_INFO}
+          content={gymAgreement.DEAL_INFO}
           onPress={() =>
             setTermInfoOpen((prev) => {
               return { ...prev, DEAL: !termInfoOpen.DEAL };
@@ -418,7 +462,7 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
         <SubTitleInfo
           title={'회원 가입 약관'}
           isOpen={termInfoOpen.SIGNUP}
-          content={SIGN_UP_INFO}
+          content={gymAgreement.SIGNUP_INFO}
           onPress={() =>
             setTermInfoOpen((prev) => {
               return { ...prev, SIGNUP: !termInfoOpen.SIGNUP };

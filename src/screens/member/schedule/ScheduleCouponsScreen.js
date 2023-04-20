@@ -23,7 +23,7 @@ const ScheduleCouponsScreen = ({ navigation, route }) => {
   const getCouponList = async () => {
     try {
       const { data } = await api.get(
-        `user-coupons?userId=${user.id}&type=${type}`
+        `user-coupons?userId=${user.id}`
       );
       setCouponList(data);
       // console.log('getCouponList data', data);

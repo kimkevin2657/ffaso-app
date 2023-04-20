@@ -16,11 +16,6 @@ import api from '../../../api/api';
 import apiv3 from "../../../api/apiv3";
 import { commaNum, resetNavigation } from '../../../util';
 import { useSelector } from 'react-redux';
-import {
-  DEAL_INFO,
-  PRODUCT_INFO,
-  SIGN_UP_INFO,
-} from '../../../constants/paymentInfos';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { MONTHS } from '../../../constants/constants';
@@ -28,7 +23,7 @@ import CenterListModal from '../../../components/modal/CenterListModal';
 import { authenticate } from './payple';
 
 const OptionPaymentScreen = ({ navigation, route }) => {
-  const { token } = useSelector((state) => state.auth);
+  const { user, token } = useSelector((state) => state.auth);
   const { gym } = route.params;
   const [oid, setOID] = useState('');
 
@@ -42,7 +37,11 @@ const OptionPaymentScreen = ({ navigation, route }) => {
     DEAL: false,
     SIGNUP: false,
   });
-
+  const [gymAgreement, setGymAgreement] = useState({
+    PRODUCT_INFO: "",
+    DEAL_INFO: "",
+    SIGNUP_INFO: "",
+  });
   const [products, setProducts] = useState({});
   const [productDiscounts, setProductDiscounts] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -60,6 +59,10 @@ const OptionPaymentScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     getProducts();
+  }, []);
+
+  useEffect(() => {
+    getGymAgreement();
   }, []);
 
   const onPayment = async (paymentMethod, hasCashReceipts, oid) => {
@@ -91,6 +94,7 @@ const OptionPaymentScreen = ({ navigation, route }) => {
         type: paymentMethod, // 추후에 변경예상
         price,
         period: Number(selectedOptionMonth),
+        userId: user?.id,
         oid: oid
       };
       if (selectedProductDetailId) {
@@ -129,7 +133,6 @@ const OptionPaymentScreen = ({ navigation, route }) => {
       var checkerdata = await apiv3.post('option-exist-checker', {optionId: selectedOption?.id, userId: user?.id}, {headers: {Authorization: `Token ${token}`,},});
       console.log(" !!!!!=======  checkerdata    ", checkerdata.data);
       if (checkerdata.data.result == 0){
-
           if (paymentMethod === '현금') {
             Alert.alert('현금영수증이 필요하신가요?', '', [
               {
@@ -177,7 +180,10 @@ const OptionPaymentScreen = ({ navigation, route }) => {
             // });
           }
 
-        } else{
+        }
+        else if (checkerdata.data.result === 2){
+          Alert.alert("이미 결제 대기중인 옵션권이 존재합니다. 관리자에게 문의하세요");
+        }else{
           Alert.alert("이미 옵션권이 존재합니다");
         }
     }
@@ -205,6 +211,20 @@ const OptionPaymentScreen = ({ navigation, route }) => {
     }
   };
 
+  const getGymAgreement = async () => {
+    try{
+      const { data }=await apiv3.post('gymagreement',{gymId:gym?.id,query:true});
+      setGymAgreement({
+        PRODUCT_INFO:data.result.product,
+        DEAL_INFO:data.result.transaction,
+        SIGNUP_INFO:data.result.registration
+      })
+    } catch (e) {
+      console.log(e);
+      console.log(e.response);
+    }
+  }
+
   const getProductDiscounts = useCallback(async (productId) => {
     try {
       const { data } = await api.get(
@@ -216,6 +236,9 @@ const OptionPaymentScreen = ({ navigation, route }) => {
       console.log('e.res', e.response);
     }
   }, []);
+
+  const maximumDate = new Date();
+  maximumDate.setDate(maximumDate.getDate() + 365); 
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: '#fbfbfb' }}>
@@ -292,6 +315,8 @@ const OptionPaymentScreen = ({ navigation, route }) => {
               <BirthPicker
                 isOpen={isOptionDatePickerOpen}
                 date={optionDate}
+                minimumDate={new Date()}
+                maximumDate={maximumDate}
                 onConfirm={(selectedDate) => {
                   setIsOptionDatePickerOpen(false);
                   setOptionDate(selectedDate);
@@ -350,7 +375,7 @@ const OptionPaymentScreen = ({ navigation, route }) => {
         <SubTitleInfo
           title={'상품고시 정보'}
           isOpen={termInfoOpen.PRODUCT}
-          content={PRODUCT_INFO}
+          content={gymAgreement.PRODUCT_INFO}
           onPress={() =>
             setTermInfoOpen((prev) => {
               return { ...prev, PRODUCT: !termInfoOpen.PRODUCT };
@@ -360,7 +385,7 @@ const OptionPaymentScreen = ({ navigation, route }) => {
         <SubTitleInfo
           title={'거래 정보'}
           isOpen={termInfoOpen.DEAL}
-          content={DEAL_INFO}
+          content={gymAgreement.DEAL_INFO}
           onPress={() =>
             setTermInfoOpen((prev) => {
               return { ...prev, DEAL: !termInfoOpen.DEAL };
@@ -370,7 +395,7 @@ const OptionPaymentScreen = ({ navigation, route }) => {
         <SubTitleInfo
           title={'회원 가입 약관'}
           isOpen={termInfoOpen.SIGNUP}
-          content={SIGN_UP_INFO}
+          content={gymAgreement.SIGNUP_INFO}
           onPress={() =>
             setTermInfoOpen((prev) => {
               return { ...prev, SIGNUP: !termInfoOpen.SIGNUP };
