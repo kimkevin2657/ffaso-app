@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
-import { Text, View, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { Text, Alert, View, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import TeacherCalendarCustom from '../../components/modal/TeacherCalendarCustom';
@@ -12,6 +12,7 @@ const TeacherSchedulesScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const { schedules = [] } = useSelector((state) => state.schedule);
+  const { teacherGyms = [] } = useSelector((state) => state.teacherGym);
 
   useFocusEffect(
     useCallback(() => {
@@ -29,7 +30,13 @@ const TeacherSchedulesScreen = ({ navigation }) => {
       headerRight: () => (
         <TouchableOpacity
           style={{ padding: 4, marginRight: 16 }}
-          onPress={() => navigation.navigate('ScheduleRegistration')}
+          onPress={() => {
+            if(teacherGyms.length===0){
+              Alert.alert('소속된 센터가 없습니다.');
+              return;
+            }
+            navigation.navigate('ScheduleRegistration')
+          }}
         >
           <Image
             style={styles.plusActionable}
