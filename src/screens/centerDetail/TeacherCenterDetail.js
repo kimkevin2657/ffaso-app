@@ -74,6 +74,11 @@ const TeacherCenterDetail = ({ navigation, route }) => {
       return;
     }
 
+    if(selectedStartTime>selectedEndTime){
+      Alert.alert('', '희망 강습 시간을 확인하세요');
+      return;
+    }
+
     const body = {
       gym: id,
       wantedDepartment,
