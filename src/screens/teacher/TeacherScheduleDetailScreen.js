@@ -48,6 +48,7 @@ const TeacherScheduleDetailScreen = ({ navigation, route }) => {
   const [openModal, setOpenModal] = useState(false);
   const [selectText, setSelectText] = useState('');
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const { teacherGyms = [] } = useSelector((state) => state.teacherGym);
 
   const onModalPress = (selectedText) => {
     const now = moment().format('YYYY-MM-DD');
@@ -171,6 +172,10 @@ const TeacherScheduleDetailScreen = ({ navigation, route }) => {
         // schedulesList.length === 0 &&
         <Touchable
           onPress={() => {
+            if(teacherGyms.length===0){
+              Alert.alert('소속된 센터가 없습니다.');
+              return;
+            }
             navigation.navigate('ScheduleRegistration');
           }}
         >
@@ -184,6 +189,10 @@ const TeacherScheduleDetailScreen = ({ navigation, route }) => {
   }, []);
 
   const onNavigateRegisterSchedule = useCallback(() => {
+    if(teacherGyms.length===0){
+      Alert.alert('소속된 센터가 없습니다.');
+      return;
+    }
     navigation.navigate('ScheduleRegistration');
   }, []);
 
