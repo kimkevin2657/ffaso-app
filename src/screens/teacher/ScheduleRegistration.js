@@ -102,10 +102,10 @@ const ScheduleRegistration = ({ navigation }) => {
     endTime
   ) => {
     if (
-      centerStartTime > startTime ||
-      centerStartTime >= endTime ||
-      centerEndTime <= startTime ||
-      centerEndTime < endTime
+      centerStartTime > (startTime+':00') ||
+      centerStartTime >= (endTime+':00') ||
+      centerEndTime <= (startTime+':00') ||
+      centerEndTime < (endTime+':00')
     ) {
       Alert.alert(
         `[${selectTicket?.name} 수강 ${centerStartTime.slice(
@@ -406,7 +406,12 @@ const ScheduleRegistration = ({ navigation }) => {
           isPickerOpen={isStartTimePickerOpen}
           time={selectedStartTime}
           onPress={() => {
-            setSelectedStartTime(new Date(Date.parse("1991-01-01T09:00:00.417-15:00")));
+            setSelectedStartTime(new Date(
+              today.getFullYear(),
+              today.getMonth(),
+              today.getDate(),
+              9
+            ));
             setIsStartTimePickerOpen(true)
             if (isSelectGym) {
               alert('센터를 선택해주세요');
