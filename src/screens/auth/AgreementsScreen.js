@@ -19,6 +19,7 @@ import {
 } from '../../constants/agreements';
 import BottomGradientButton from '../../components/buttons/BottomGradientButton';
 import { CheckBoxItem } from '../../components/CheckBoxItem';
+import apiv3 from '../../api/apiv3';
 
 const window_width = Dimensions.get('window').width;
 const window_height = Dimensions.get('window').height;
@@ -31,6 +32,7 @@ const AgreementsScreen = ({ navigation, route }) => {
   const [agreement4, setAgreement4] = useState(false);
   const [agreement5, setAgreement5] = useState(false);
   const [agreement6, setAgreement6] = useState(false);
+  const [superadminBank, setSuberadminbank] = useState(AGREEMENT5);
 
   useEffect(() => {
     // navigation.setOptions({
@@ -52,8 +54,23 @@ const AgreementsScreen = ({ navigation, route }) => {
     //     </Touchable>
     //   ),
     // });
+    // let agreement5Account=AGREEMENT5;
+    // console.log(agreement5Account)
+    const getSuperadminBank = async () => {
+      const { data } = await apiv3.post('superadminbank ', {
+        query: true,
+        userId: "5018228f-9e58-40c4-a2e8-f499d2880277"
+      });
+      setSuberadminbank(
+        superadminBank
+        .replace(/은행명 :.*/g,'은행명 : '+ data.result.bankName)
+        .replace(/계좌번호 :.*/g,'계좌번호 : '+data.result.accountNumber)
+      );
+    }
+    getSuperadminBank();
   }, []);
 
+  
   return (
     <ScrollView
       style={styles.container}
@@ -136,7 +153,7 @@ const AgreementsScreen = ({ navigation, route }) => {
         <Agreement
           agreement={agreement5}
           label={'환불 진행 및 정산 프로세스 동의'}
-          content={AGREEMENT5}
+          content={superadminBank}
           onPress={() => setAgreement5(!agreement5)}
         />
         <Agreement
