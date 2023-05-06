@@ -146,7 +146,7 @@ const TicketPaymentScreen = ({ navigation, route }) => {
     } else if (!selectedTeacher) {
       Alert.alert('강사를 선택해주세요.');
     } else {
-      var checkerdata = await apiv3.post('lesson-exist-checker', {ticketId: selectedTicket?.id, userId: user?.id}, {headers: {Authorization: `Token ${token}`,},});
+      var checkerdata = await apiv3.post('lesson-exist-checker', {ticketId: selectedTicket?.id, userId: user?.id, ticketDate: ticketDate}, {headers: {Authorization: `Token ${token}`,},});
       console.log("!!!==== checkerdata   ", checkerdata.data);
       if (checkerdata.data.result === 0){
         if (paymentMethod === '현금') {
