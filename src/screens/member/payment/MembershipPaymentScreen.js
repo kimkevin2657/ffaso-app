@@ -139,7 +139,7 @@ const MembershipPaymentScreen = ({ navigation, route }) => {
     } else if (selectMonth === 0) {
       Alert.alert('등록 개월을 선택해주세요.');
     } else {
-      var checkerdata = await apiv3.post('membership-exist-checker', {membershipId: selectNoblesss?.id, userId: user?.id}, {headers: {Authorization: `Token ${token}`,},});
+      var checkerdata = await apiv3.post('membership-exist-checker', {membershipId: selectNoblesss?.id, userId: user?.id, availableStartDate: birthDate}, {headers: {Authorization: `Token ${token}`,},});
       if (checkerdata.data.result === 0){
         if (paymentMethod === '현금') {
           Alert.alert('현금영수증이 필요하신가요?', '', [
